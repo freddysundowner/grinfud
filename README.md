@@ -14,6 +14,8 @@ systemd/Nginx configuration on all three versions.
 After installation, run `sudo bash seed-menu.sh` from this checkout and type
 `SEED` to confirm. If upgrading an older installation, first pull the latest
 code and rerun `install.sh` to install the new seed command.
+After seeding, the command briefly restarts GrinFud to refresh its in-memory menu
+and checks that the app responds. Reload the storefront or Admin afterwards.
 
 This adds three **visible** sample menu items: breakfast basket, fruit bowl and
 family vegetable basket. Each has a bundled photo saved in persistent uploads;

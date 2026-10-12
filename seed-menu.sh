@@ -17,3 +17,15 @@ runuser -u grinfud -- env \
   PHOTO_STORAGE=local DATA_DIR=/var/lib/grinfud \
   DATABASE_URL="postgresql://grinfud@localhost/grinfud?host=/var/run/postgresql&port=$PGPORT" \
   /opt/grinfud/node/bin/node "$APP/dev/seed-menu.js" --confirm
+echo 'Refreshing the running menu (briefly restarting GrinFud)…'
+systemctl restart grinfud.service
+READY=0
+for attempt in {1..20}; do
+  if curl -fsS --max-time 2 http://127.0.0.1:19138/api/menu >/dev/null; then READY=1; break; fi
+  sleep 1
+done
+[[ "$READY" == 1 ]] || {
+  echo 'Samples are saved, but the app did not become ready. Check: journalctl -u grinfud -n 50' >&2
+  exit 1
+}
+echo 'Menu refreshed. Reload the storefront or Admin menu to see the sample items.'
