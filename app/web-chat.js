@@ -38,7 +38,10 @@ module.exports = function mountWebChat(app, { db, publicMenu, whatsappUrl, price
     next();
   }
   setInterval(() => { for (const [ip, b] of rates) if (Date.now() - b.start > 60000) rates.delete(ip); }, 60000).unref();
-  const result = st => ({ business_name: publicMenu().business_name, whatsapp_url: whatsappUrl(), ai_available: ai.available(), messages: st.messages, suggestions: st.suggestions });
+  // Website shoppers already have the visual storefront menu. Keep its item
+  // shortcuts out of the composer; retain option/quantity/confirmation controls.
+  // Filter only the website response, leaving WhatsApp and stored state intact.
+  const result = st => ({ business_name: publicMenu().business_name, whatsapp_url: whatsappUrl(), ai_available: ai.available(), messages: st.messages, suggestions: st.suggestions.filter(s => st.step !== 'menu' || !/^\d+$/.test(s.value)) });
   const money = n => `${publicMenu().currency} ${Number(n).toLocaleString('en-KE')}`;
   function menu(st) {
     const m = publicMenu();
