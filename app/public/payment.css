@@ -1,0 +1,19 @@
+.gfp{background:#fff;border:1px solid #E4DDCC;border-radius:18px;padding:16px;margin-top:16px;text-align:left;color:#17241C;min-width:0;overflow-wrap:anywhere}
+.gfp-h{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.gfp-lbl{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#55655B;font-weight:700}
+.gfp-badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;background:#F3EEE2;color:#55655B}
+.gfp-badge.ok{background:#E3F0E6;color:#1F5C3A}.gfp-badge.wait{background:#FFF4DE;color:#6B4A08}.gfp-badge.bad{background:#FBE3DE;color:#7A2717}
+.gfp-amt{font-family:'Bricolage Grotesque','DM Sans',sans-serif;font-weight:800;font-size:22px;color:#1F5C3A;margin-top:6px;letter-spacing:-.02em}
+.gfp-f{display:block;font-weight:700;font-size:14px;margin:12px 0 6px}
+.gfp-in{width:100%;background:#fff;border:1.5px solid #E4DDCC;border-radius:12px;padding:10px 14px;min-height:44px;font:inherit;font-size:16px;color:inherit}
+.gfp-in:focus{outline:2px solid #1F5C3A;outline-offset:1px;border-color:#1F5C3A}
+.gfp-btn{appearance:none;border:0;border-radius:12px;padding:12px 18px;min-height:44px;font:inherit;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;width:100%;margin-top:12px}
+.gfp-btn.p{background:#1F5C3A;color:#FBF7EE}.gfp-btn.p:hover{background:#143D27}
+.gfp-btn.o{background:#fff;border:1.5px solid #E4DDCC;color:#17241C}
+.gfp-btn:disabled{opacity:.6;cursor:not-allowed}
+.gfp-btn:focus-visible{outline:3px solid #143D27;outline-offset:2px}
+.gfp-msg{font-size:14px;margin-top:10px;padding:10px 12px;border-radius:12px;background:#F3EEE2}
+.gfp-msg.ok{background:#E3F0E6;color:#1F5C3A}.gfp-msg.wait{background:#FFF4DE;color:#6B4A08}.gfp-msg.bad{background:#FBE3DE;color:#7A2717}
+.gfp-note{font-size:13px;color:#55655B;margin-top:8px}
+.gfp-rc{font-family:ui-monospace,monospace;font-weight:700;letter-spacing:.04em}
+@media(max-width:480px){.gfp{padding:14px;border-radius:16px}.gfp-amt{font-size:20px}}

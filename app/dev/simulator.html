@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>WhatsApp Simulator · GrinFud demo</title>
+<link rel="icon" href="/logo.svg">
+<style>
+:root{--green:#1F5C3A;--forest:#143D27;--gold:#F2B33D;--cream:#FBF7EE;--ink:#17241C;--muted:#55655B;--line:#E4DDCC;--wa:#EFEAE2;--out:#D9FDD3;--red:#9A3B2A}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--cream);color:var(--ink);font-family:system-ui,-apple-system,'Segoe UI',sans-serif;font-size:15px;line-height:1.4}
+button,input,select{font:inherit;color:inherit}
+header{background:var(--green);color:var(--cream)}
+header .hin{max-width:1100px;margin:0 auto;padding:12px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+header img{width:34px;height:34px}
+header b{font-size:19px}
+header .tag{background:var(--gold);color:var(--ink);font-weight:800;font-size:12px;padding:3px 8px;border-radius:999px}
+header nav{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+header a{color:var(--cream);text-decoration:none;font-weight:700;padding:8px 12px;border-radius:9px;background:rgba(255,255,255,.12)}
+main{max-width:1100px;margin:0 auto;padding:16px}
+.bar{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:700px){.bar{grid-template-columns:1fr}}
+label{display:block;font-weight:700;font-size:13px;margin-bottom:4px}
+.t{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:9px 11px;min-height:42px;background:#fff}
+.hint{font-size:13px;color:var(--muted);margin-top:5px}
+.codes{margin-top:12px}
+.code{background:#FFF4DE;border:1px solid #F0D49A;border-radius:12px;padding:12px 14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.code .big{font-size:22px;font-weight:800;letter-spacing:.12em}
+.phones{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+@media(max-width:800px){.phones{grid-template-columns:1fr}}
+.phone{background:#fff;border:1px solid var(--line);border-radius:22px;overflow:hidden;display:flex;flex-direction:column;height:min(640px,78vh)}
+.phone .hd{background:#075E54;color:#fff;padding:12px 14px}
+.phone .hd b{display:block}
+.phone .hd span{font-size:13px;opacity:.85}
+.chat{flex:1;overflow-y:auto;background:var(--wa);padding:12px 10px;display:flex;flex-direction:column;gap:6px}
+.msg{max-width:86%;min-width:74px;padding:7px 10px 18px;border-radius:10px;white-space:pre-wrap;word-wrap:break-word;position:relative;box-shadow:0 1px 1px rgba(0,0,0,.08);font-size:14.5px}
+.msg time{position:absolute;right:8px;bottom:3px;font-size:11px;color:#667781}
+.mi{align-self:flex-start;background:#fff}
+.mo{align-self:flex-end;background:var(--out)}
+.sys{align-self:center;background:#FFF4DE;color:#6B4A08;font-size:13px;padding:6px 10px;border-radius:8px;max-width:95%;text-align:center;white-space:pre-wrap}
+.empty{margin:auto;color:var(--muted);text-align:center;padding:20px;font-size:14px}
+.compose{display:flex;gap:6px;padding:8px;background:#F0F0F0}
+.compose input{flex:1;border:0;border-radius:20px;padding:10px 14px;min-height:42px;background:#fff}
+.compose button{border:0;border-radius:50%;width:42px;height:42px;cursor:pointer;background:#00A884;color:#fff;font-size:18px;flex:none}
+.compose button.loc{background:#fff;color:var(--ink)}
+.chips{display:flex;gap:6px;padding:6px 8px 0;background:#F0F0F0;flex-wrap:wrap}
+.chips button{border:1px solid #D7D7D7;background:#fff;border-radius:999px;padding:5px 11px;cursor:pointer;font-size:13px}
+.btn{border:0;border-radius:10px;padding:9px 14px;min-height:40px;font-weight:700;cursor:pointer;background:var(--green);color:var(--cream)}
+.btn.o{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
+.err{color:var(--red);font-weight:700}
+.steps{margin:14px 0 0;padding:12px 14px 12px 32px;background:#fff;border:1px solid var(--line);border-radius:14px}
+.steps li{margin:4px 0}
+
+/* mobile */
+html,body{overflow-x:hidden}
+@supports(overflow:clip){html,body{overflow-x:clip}}
+header .hin,main{padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+main{padding-bottom:calc(16px + env(safe-area-inset-bottom))}
+header a{min-height:44px;display:inline-flex;align-items:center}
+.msg a{overflow-wrap:anywhere}
+@media(max-width:700px){
+ html,body,.t,input,select{font-size:16px}
+ header nav{margin-left:0;width:100%}
+ header nav a{flex:1;justify-content:center}
+ .t,.btn{min-height:44px}
+ .compose input{min-height:44px}
+ .compose button{width:44px;height:44px}
+ .chips{overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none}
+ .chips button{min-height:40px;padding:8px 14px;flex:none;font-size:15px}
+ .phone{height:min(600px,72dvh);border-radius:18px}
+ .code input.t{max-width:none!important;flex:1 1 140px}
+ .code .btn{flex:1 1 auto}
+ .compose{padding-bottom:max(8px,env(safe-area-inset-bottom))}
+}
+</style>
+</head>
+<body>
+<header><div class="hin"><img src="/logo.svg" alt=""><b>WhatsApp simulator</b><span class="tag">DEMO · no real messages</span>
+  <nav><a href="/admin" target="_blank">Admin</a><a href="/" target="_blank">Order page</a></nav></div></header>
+<main>
+  <div class="bar">
+    <div><label for="biz">Customer is messaging this business number</label><select class="t" id="biz"></select>
+      <div class="hint" id="bizHint"></div></div>
+    <div><label for="cust">Customer’s phone</label><input class="t" id="cust" value="0700 111 222" inputmode="tel">
+      <div class="hint">Change it to act as a different customer.</div></div>
+  </div>
+  <div class="codes" id="codes"></div>
+  <ol class="steps" id="steps">
+    <li>Open <a href="/admin" target="_blank">Admin</a> → Settings → <b>WhatsApp ordering number</b> and link a number. Try <b>0711 000 111</b> (already on the demo LeadsIntel) or connect any new number.</li>
+    <li>Set <b>Kitchen phone for new-order alerts</b> in Settings to a different number.</li>
+    <li>Come back here and type <b>hi</b> as the customer.</li>
+  </ol>
+  <div class="phones">
+    <section class="phone" aria-label="Customer phone">
+      <div class="hd"><b id="custTitle">Customer</b><span id="custSub">chatting with GrinFud</span></div>
+      <div class="chat" id="chatC"><div class="empty">No messages yet.</div></div>
+      <div class="chips" id="chips"></div>
+      <form class="compose" id="form"><button type="button" class="loc" id="loc" title="Share location" aria-label="Share location">📍</button>
+        <input id="msg" placeholder="Type a message" autocomplete="off" aria-label="Message"><button aria-label="Send">➤</button></form>
+    </section>
+    <section class="phone" aria-label="Kitchen phone">
+      <div class="hd"><b>Kitchen phone</b><span id="kitSub">new-order alerts</span></div>
+      <div class="chat" id="chatK"><div class="empty">Order alerts will appear here.</div></div>
+      <div class="compose"><button type="button" class="btn o" id="reset" style="border-radius:10px;width:auto;padding:0 14px;font-size:14px;margin-left:auto">Clear all chats</button></div>
+    </section>
+  </div>
+  <p class="err" id="err"></p>
+</main>
+<script>
+const $ = s => document.querySelector(s);
+const dg = s => String(s || '').replace(/\D/g, '');
+const ke = p => { let d = dg(p); if (d.startsWith('0') && d.length === 10) d = '254' + d.slice(1); if (d.length === 9) d = '254' + d; return d; };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const fmt = s => esc(s).replace(/\*([^*\n]+)\*/g, '<b>$1</b>').replace(/(^|\s)_([^_\n]+)_/g, '$1<i>$2</i>')
+  .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+const tm = t => new Date(t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+let msgs = [], last = 0, numbers = [], kitchen = '', kitchens = [], first = true;
+
+async function poll() {
+  try {
+    const r = await (await fetch('/demo/sim/state?after=' + last)).json();
+    if (r.msgs.length) { msgs = msgs.concat(r.msgs); last = msgs[msgs.length - 1].id; }
+    kitchen = r.kitchen; kitchens = (r.kitchens || [r.kitchen]).map(dg); renderNumbers(r.numbers); renderCodes(r.codes); render();
+  } catch {}
+  setTimeout(poll, 1500);
+}
+function renderNumbers(list) {
+  const key = JSON.stringify(list); if (key === JSON.stringify(numbers)) return; numbers = list;
+  const sel = $('#biz'), cur = sel.value;
+  const here = n => n.local === true;
+  sel.innerHTML = list.map(n => `<option value="${esc(n.e164)}">${esc(n.display)}${here(n) ? '  ✓ linked to GrinFud' : ''}</option>`).join('');
+  const pick = list.find(n => n.e164 === cur) || list.find(here) || list[0]; if (pick) sel.value = pick.e164;
+  $('#steps').hidden = list.some(here);
+  bizHint(); render(true);
+}
+function bizHint() {
+  const n = numbers.find(x => x.e164 === $('#biz').value);
+  $('#bizHint').textContent = !n ? '' : n.local === true ? 'Chats on this number go to GrinFud.' : 'This number is not linked to GrinFud, so messages won’t be answered by the order menu.';
+}
+function renderCodes(codes) {
+  $('#codes').innerHTML = codes.map(c => `<div class="code"><span>📱 WhatsApp sent a verification code to <b>${esc(c.e164)}</b>:</span><span class="big">${esc(c.code)}</span>
+    <input class="t" style="max-width:140px" id="c-${esc(c.id)}" placeholder="Enter code" inputmode="numeric"><button class="btn" data-code="${esc(c.id)}">Give code to LeadsIntel</button>
+    <span class="hint" style="flex-basis:100%">In real life LeadsIntel asks for this code. Here you enter it yourself.</span></div>`).join('');
+  document.querySelectorAll('[data-code]').forEach(b => b.onclick = async () => {
+    const id = b.dataset.code; const r = await fetch('/demo/sim/code', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, code: $('#c-' + id).value }) });
+    const j = await r.json(); $('#err').textContent = j.error || ''; });
+}
+let sig = '';
+function render(force) {
+  const biz = dg($('#biz').value), cust = ke($('#cust').value), kit = dg(kitchen);
+  const s = [biz, cust, kit, msgs.length].join('|'); if (s === sig && !force) return; sig = s;
+  $('#custTitle').textContent = '+' + cust; $('#custSub').textContent = 'chatting with ' + ($('#biz').selectedOptions[0]?.text.replace(/\s+✓.*/, '') || '—');
+  $('#kitSub').textContent = kit ? kitchens.map(k => '+' + k).join(', ') + ' · new-order alerts' : 'set the kitchen phone in Admin → Settings';
+  const conv = msgs.filter(m => (m.from === cust && m.to === biz) || (m.from === biz && m.to === cust));
+  const kitMsgs = msgs.filter(m => m.sms || (kitchens.includes(m.to) && m.from !== m.to)); // every kitchen phone, plus SMS alerts
+  paint($('#chatC'), conv, m => m.from === cust, 'Say <b>hi</b> to start ordering.');
+  paint($('#chatK'), kitMsgs, () => false, 'Order alerts will appear here.');
+  const lastBot = [...conv].reverse().find(m => m.from === biz && !m.system);
+  const nums = lastBot ? [...lastBot.text.matchAll(/^\*?(\d{1,2})\.\*?\s/gm)].map(x => x[1]) : [];
+  $('#chips').innerHTML = (nums.length ? nums : ['hi']).concat(conv.length ? ['STATUS', 'MENU'] : []).map(n => `<button type="button" data-q="${esc(n)}">${esc(n)}</button>`).join('');
+  document.querySelectorAll('[data-q]').forEach(b => b.onclick = () => send({ text: b.dataset.q }));
+}
+function paint(el, list, mine, empty) {
+  const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 60;
+  el.innerHTML = list.length ? list.map(m => m.system ? `<div class="sys">${esc(m.text)}</div>`
+    : `<div class="msg ${mine(m) ? 'mo' : 'mi'}">${fmt(m.text)}<time>${tm(m.at)}</time></div>`).join('') : `<div class="empty">${empty}</div>`;
+  if (atBottom || first) el.scrollTop = el.scrollHeight;
+}
+async function send(body) {
+  $('#err').textContent = '';
+  const r = await fetch('/demo/sim/send', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ from: ke($('#cust').value), to: $('#biz').value, ...body }) });
+  const j = await r.json(); if (j.error) $('#err').textContent = j.error;
+  first = true; setTimeout(() => first = false, 3000);
+}
+$('#form').onsubmit = e => { e.preventDefault(); const t = $('#msg').value.trim(); if (!t) return; $('#msg').value = ''; send({ text: t }); };
+$('#loc').onclick = () => send({ location: { latitude: -1.2921, longitude: 36.7869, name: 'Kilimani, Nairobi' } });
+$('#biz').onchange = () => { bizHint(); render(true); };
+$('#cust').oninput = () => render(true);
+$('#reset').onclick = async () => { if (!confirm('Clear all simulated chats?')) return; await fetch('/demo/sim/reset', { method: 'POST' }); msgs = []; last = 0; render(true); };
+poll();
+</script>
+</body>
+</html>

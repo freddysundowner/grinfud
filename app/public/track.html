@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Track your order — GrinFud</title>
+<meta name="theme-color" content="#1F5C3A">
+<link rel="icon" href="/logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/payment.css">
+<style>
+:root{--green:#1F5C3A;--forest:#143D27;--gold:#F2B33D;--cream:#FBF7EE;--ink:#17241C;--muted:#55655B;--line:#E4DDCC;--card:#FFFFFF}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--cream);color:var(--ink);font-family:'DM Sans',system-ui,sans-serif;font-size:16px;line-height:1.45}
+h1,h2,.display{font-family:'Bricolage Grotesque','DM Sans',sans-serif;letter-spacing:-0.02em;margin:0}
+.wrap{max-width:620px;margin:0 auto;padding:0 16px}
+header{background:var(--green);color:var(--cream);padding:16px 0 22px}
+.brand{display:flex;align-items:center;gap:10px;color:inherit;text-decoration:none}
+.brand img{width:40px;height:40px}
+.brand b{font-family:'Bricolage Grotesque';font-weight:800;font-size:24px;letter-spacing:-0.03em}
+.brand b span{color:var(--gold)}
+header h1{font-size:30px;line-height:1.05;margin-top:18px}
+header p{margin:6px 0 0;color:#DCE8DF}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-top:16px}
+.code{display:inline-block;background:var(--gold);color:var(--ink);font-family:'Bricolage Grotesque';font-weight:800;font-size:20px;padding:4px 12px;border-radius:10px}
+.steps{list-style:none;padding:0;margin:14px 0 0}
+.steps li{display:grid;grid-template-columns:32px 1fr;gap:12px;position:relative;padding-bottom:18px;color:var(--muted)}
+.steps li:last-child{padding-bottom:0}
+.steps li::before{content:"";position:absolute;left:15px;top:30px;bottom:-2px;width:2px;background:var(--line)}
+.steps li:last-child::before{display:none}
+.dot{width:32px;height:32px;border-radius:50%;border:2px solid var(--line);background:#fff;display:grid;place-items:center;font-size:15px;font-weight:700;z-index:1}
+.steps li.done{color:var(--ink)}.steps li.done .dot{background:var(--green);border-color:var(--green);color:#fff}
+.steps li.done::before{background:var(--green)}
+.steps li.now{color:var(--ink)}.steps li.now .dot{border-color:var(--green);color:var(--green);box-shadow:0 0 0 4px #DDEBE1}
+.steps b{display:block;font-size:17px}.steps span.s{font-size:14px}
+.cancelled{background:#FBE3DE;color:#7A2717;border-radius:12px;padding:12px 14px;font-weight:700;margin-top:12px}
+.row{display:flex;justify-content:space-between;gap:12px;padding:6px 0}
+.row .o{color:var(--muted);font-size:14px}
+.grand{font-family:'Bricolage Grotesque';font-weight:800;font-size:20px;color:var(--green);border-top:1px solid var(--line);margin-top:6px;padding-top:10px}
+.muted{color:var(--muted)}
+.lbl{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:6px}
+.btn{appearance:none;border:0;border-radius:12px;padding:12px 18px;min-height:44px;font:inherit;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+.btn-p{background:var(--green);color:var(--cream)}.btn-p:hover{background:var(--forest)}
+.btn-o{background:#fff;border:1.5px solid var(--line);color:var(--ink)}
+.btn:disabled{opacity:.6;cursor:wait}
+.btn:focus-visible,a:focus-visible{outline:3px solid var(--forest);outline-offset:2px}
+.acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.msg{margin-top:10px;font-size:14px}
+.err{background:#FBE3DE;color:#7A2717;border-radius:12px;padding:14px;font-weight:700;margin-top:20px}
+footer{color:var(--muted);text-align:center;font-size:14px;padding:26px 16px 40px}
+footer a{color:var(--green);font-weight:700}
+
+/* mobile */
+html,body{overflow-x:hidden}
+@supports(overflow:clip){html,body{overflow-x:clip}}
+.wrap{padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+footer{padding-bottom:calc(40px + env(safe-area-inset-bottom))}
+.row>div,.card{min-width:0;overflow-wrap:anywhere}
+.row>b,.row>span:last-child{white-space:nowrap}
+.msg a{display:inline-block;min-height:44px;line-height:44px}
+@media(max-width:480px){
+ header h1{font-size:25px}
+ .card{padding:14px;border-radius:16px}
+ .acts .btn{flex:1 1 calc(50% - 8px)}
+ #pinBtn{flex-basis:100%}
+}
+.rcpt-list{display:flex;flex-direction:column;gap:6px}
+.rcpt-link{display:flex;justify-content:space-between;align-items:center;min-height:44px;padding:8px 12px;border:1.5px solid var(--line);border-radius:12px;color:var(--green);font-weight:700;text-decoration:none}
+.rcpt-link:hover{background:#F3F8F4;border-color:var(--green)}
+.rcpt-err:empty{display:none}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="brand" href="/"><img src="/logo-light.svg" alt=""><b>Grin<span>Fud</span></b></a>
+  <h1 id="title">Your order</h1><p id="sub">Loading…</p>
+</div></header>
+<main class="wrap" id="main" aria-live="polite"></main>
+<div class="wrap" id="payHost"></div>
+<footer id="foot"></footer>
+<script src="/payment.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const token = location.pathname.split('/').filter(Boolean).pop();
+const STEPS = [['new', 'Order received', 'We have your order.'], ['preparing', 'Being prepared', 'Our kitchen is getting it ready.'],
+  ['out_for_delivery', 'On the way', 'The rider is heading to you.'], ['delivered', 'Delivered', 'Enjoy! Thank you for ordering.']];
+let O = null, pinMsg = '';
+const money = n => `${O.currency || 'KSh'} ${Number(n || 0).toLocaleString('en-KE')}`;
+const when = t => t ? new Date(t.replace(' ', 'T') + 'Z').toLocaleString('en-KE', { dateStyle: 'medium', timeStyle: 'short' }) : '';
+
+function render() {
+  const at = STEPS.findIndex(s => s[0] === O.status), cancelled = O.status === 'cancelled';
+  document.title = `Order ${O.code} — ${O.business_name}`;
+  $('#title').textContent = cancelled ? 'This order was cancelled' : O.status === 'delivered' ? 'Delivered. Enjoy!' : (O.first_name ? O.first_name + ', ' : '') + ({ new: 'we have your order', preparing: 'your order is being prepared', out_for_delivery: 'your order is on the way' }[O.status] || 'your order is in progress');
+  $('#title').textContent = $('#title').textContent.replace(/^./, c => c.toUpperCase());
+  $('#sub').textContent = [O.delivery_date, O.delivery_time].filter(Boolean).length ? `Delivery: ${[O.delivery_date, O.delivery_time].filter(Boolean).join(', ')}` : 'Thank you for ordering.';
+  $('#main').innerHTML = `
+    <section class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><span class="code">${esc(O.code)}</span><span class="muted" style="font-size:14px">Updated ${esc(when(O.updated_at))}</span></div>
+      ${cancelled ? '<div class="cancelled">This order was cancelled. Nothing will be delivered.</div>' : `<ol class="steps">${STEPS.map((s, i) => `<li class="${i < at || O.status === 'delivered' ? 'done' : i === at ? 'now' : ''}"${i === at ? ' aria-current="step"' : ''}>
+        <span class="dot">${i < at || O.status === 'delivered' ? '✓' : i + 1}</span><div><b>${s[1]}</b><span class="s">${s[2]}</span></div></li>`).join('')}</ol>`}</section>
+    <section class="card"><div class="lbl">Delivering to</div><div>${esc(O.location)}</div>
+      ${O.map_link ? `<div class="msg">📍 Location pin added · <a href="${esc(O.map_link)}" target="_blank" rel="noopener" style="color:var(--green);font-weight:700">See it on the map</a></div>` : ''}
+      ${O.can_pin ? `<div class="acts"><button class="btn ${O.map_link ? 'btn-o' : 'btn-p'}" id="pinBtn">📍 ${O.map_link ? 'Update my location pin' : 'Share my location pin'}</button></div>
+        <div class="msg muted" id="pinMsg">${esc(pinMsg || (O.map_link ? 'Moved? Tap to send your current spot.' : 'Stand where you want the delivery, then tap. It helps the rider find you without calling.'))}</div>` : ''}</section>
+    <section class="card"><div class="lbl">Your order</div>
+      ${O.items.map(i => `<div class="row"><div><b>${i.qty} × ${esc(i.name)}</b>${i.options.length ? `<div class="o">${esc(i.options.join(', '))}</div>` : ''}</div><b>${money(i.line_total)}</b></div>`).join('')}
+      ${O.delivery_fee ? `<div class="row muted"><span>Delivery</span><span>${money(O.delivery_fee)}</span></div>` : ''}
+      <div class="row grand"><span>Total</span><span>${money(O.total)}</span></div>
+      ${O.payment_note ? `<div class="msg muted">${esc(O.payment_note)}</div>` : ''}</section>
+    ${receiptsHtml()}
+    <section class="card"><div class="lbl">Need help with this order?</div>
+      <div class="acts">${O.contact_phone ? `<a class="btn btn-o" href="tel:+${esc(O.contact_phone)}">📞 Call us</a><a class="btn btn-o" href="https://wa.me/${esc(O.contact_phone)}?text=${encodeURIComponent('Hello, about my order ' + O.code)}" target="_blank" rel="noopener">WhatsApp us</a>` : ''}
+        <a class="btn btn-o" href="/">Order again</a></div></section>`;
+  $('#foot').innerHTML = cancelled || O.status === 'delivered' ? '' : 'This page updates by itself. Keep the link to check back.';
+  const pb = $('#pinBtn'); if (pb) pb.onclick = sharePin;
+}
+function receiptsHtml() {
+  if (!window.GFReceipt) return '';
+  const t = GFReceipt.types(O.receipt_types), paid = O.payment_status === 'completed';
+  return `<section class="card" data-rcpt-box><div class="lbl">Receipts</div>
+    <div class="rcpt-list">${t.map(k => `<a class="rcpt-link" data-receipt="${esc(k)}-${esc(O.code)}.pdf" href="${esc(GFReceipt.trackUrl(token, k))}"><span>${esc(GFReceipt.LABEL[k])}</span><b aria-hidden="true">↓</b></a>`).join('')}</div>
+    ${!paid ? '<div class="msg muted">The order summary is not proof of payment.</div>' : O.payment_receipt ? `<div class="msg muted">M-Pesa receipt ${esc(O.payment_receipt)}</div>` : ''}
+    ${O.delivered_at ? `<div class="msg muted">Delivered ${esc(when(O.delivered_at))}</div>` : ''}
+    <div class="msg rcpt-err" role="alert" style="color:#7A2717;font-weight:700"></div></section>`;
+}
+function sharePin() {
+  const pb = $('#pinBtn'), say = m => { pinMsg = m; $('#pinMsg').textContent = m; };
+  if (!navigator.geolocation) return say('This browser cannot share a location. Send your pin to us on WhatsApp instead.');
+  pb.disabled = true; say('Finding you… allow location if your phone asks.');
+  navigator.geolocation.getCurrentPosition(async p => {
+    try {
+      const r = await fetch(`/api/track/${token}/pin`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ lat: p.coords.latitude, lng: p.coords.longitude }) });
+      const d = await r.json(); if (!r.ok) throw new Error(d.error || 'Could not save your location.');
+      O = d; pinMsg = 'Saved. The rider now has your pin. Thank you!'; render();
+    } catch (x) { pb.disabled = false; say(x.message); }
+  }, e => { pb.disabled = false; say(e.code === 1 ? 'Location is blocked for this site. Allow it in your browser settings and tap again.' : 'Could not find your location. Try again outdoors.'); },
+  { enableHighAccuracy: true, timeout: 15000, maximumAge: 30000 });
+}
+async function load(first) {
+  try {
+    const r = await fetch('/api/track/' + token); const d = await r.json();
+    if (!r.ok) { if (first) { $('#sub').textContent = ''; $('#title').textContent = 'Order not found'; $('#main').innerHTML = `<div class="err">${esc(d.error || 'We could not find that order.')}</div><div class="acts"><a class="btn btn-p" href="/">Go to the menu</a></div>`; } return false; }
+    const changed = !O || O.status !== d.status || O.updated_at !== d.updated_at || O.payment_status !== d.payment_status || String(O.receipt_types) !== String(d.receipt_types); O = d; if (changed) render(); return true;
+  } catch { if (first) { $('#sub').textContent = ''; $('#main').innerHTML = '<div class="err">Could not load your order. Check your connection and refresh.</div>'; } return true; }
+}
+let payPanel = null;
+load(true).then(ok => { if (ok && O && window.GFPay) payPanel = GFPay.mount($('#payHost'), token); if (ok) setInterval(() => { if (!document.hidden && O && !['delivered', 'cancelled'].includes(O.status)) load(false); }, 30000); });
+</script>
+</body>
+</html>

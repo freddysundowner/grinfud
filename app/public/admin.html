@@ -1,0 +1,898 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GrinFud Admin</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/logo.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--green:#1F5C3A;--forest:#143D27;--gold:#F2B33D;--deepgold:#B8760F;--cream:#FBF7EE;--ink:#17241C;--muted:#55655B;--line:#E4DDCC;--red:#9A3B2A}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--cream);color:var(--ink);font-family:'DM Sans',system-ui,sans-serif;font-size:15px;line-height:1.45}
+h1,h2,h3{font-family:'Bricolage Grotesque','DM Sans',sans-serif;letter-spacing:-0.02em;margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+.top{background:var(--green);color:var(--cream)}
+.top .in{max-width:1100px;margin:0 auto;padding:14px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.top img{width:38px;height:38px}
+.top .nm{font-family:'Bricolage Grotesque';font-weight:800;font-size:22px}
+.top .nm span{color:var(--gold)}
+.tabs{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
+.tabs button{background:transparent;border:0;color:#DCE8DF;padding:10px 14px;border-radius:10px;font-weight:700;cursor:pointer;min-height:42px}
+.tabs button[aria-selected=true]{background:var(--cream);color:var(--green)}
+main{max-width:1100px;margin:0 auto;padding:20px 16px 80px}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px}
+.btn{appearance:none;border:0;border-radius:10px;padding:10px 16px;min-height:42px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-decoration:none}
+.btn-p{background:var(--green);color:var(--cream)}.btn-p:hover{background:var(--forest)}
+.btn-g{background:var(--gold);color:var(--ink)}
+.btn-o{background:#fff;border:1.5px solid var(--line);color:var(--ink)}
+.btn-d{background:#fff;border:1.5px solid #E7C2B8;color:var(--red)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+label.f{display:block;font-weight:700;font-size:13px;margin:12px 0 5px}
+.t{width:100%;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;min-height:42px}
+.t:focus{outline:2px solid var(--green);outline-offset:1px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:640px){.grid2{grid-template-columns:1fr}}
+.muted{color:var(--muted)}
+.pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700}
+.st-new{background:#FDEBD0;color:#6B4A08}.st-preparing{background:#E3EEF9;color:#1E4A73}.st-out_for_delivery{background:#EDE6F7;color:#4B2E7A}
+.st-delivered{background:#E3F0E6;color:#1F5C3A}.st-cancelled{background:#F2E4E1;color:#7A2717}
+.order{margin-bottom:12px}
+.order .hd{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.order .code{font-family:'Bricolage Grotesque';font-weight:800;font-size:20px;color:var(--green)}
+.order .cols{display:grid;grid-template-columns:1.1fr 1fr;gap:16px;margin-top:10px}
+@media(max-width:720px){.order .cols{grid-template-columns:1fr}}
+.order ul{margin:0;padding-left:18px}
+.order .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.warn{background:#FFF4DE;border:1px solid #F0D49A;border-radius:10px;padding:8px 12px;font-size:13px;margin-top:10px}
+.items{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.it img,.it .ph{width:100%;height:150px;object-fit:cover;border-radius:12px;background:#EFE6D2;display:block}
+.it h3{font-size:18px;margin-top:10px;color:var(--green)}
+.og{border:1.5px dashed var(--line);border-radius:12px;padding:12px;margin-top:10px}
+.ch{display:grid;grid-template-columns:1fr 120px 42px;gap:8px;margin-top:8px}
+.x{background:#fff;border:1.5px solid var(--line);border-radius:10px;cursor:pointer;min-height:42px}
+.login{max-width:380px;margin:12vh auto;text-align:center}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 18px;border-radius:12px;font-weight:700;display:none;z-index:50}
+.disc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 12px}.disc[data-on=none]{grid-template-columns:minmax(0,1fr)}.disc .hint{grid-column:1/-1;margin:4px 0 0;font-size:13px}.disc .t{min-height:44px}.disc-v{position:relative}.disc-v input{padding-right:52px}.disc-v span{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-weight:700;pointer-events:none}
+.was{text-decoration:line-through;color:var(--muted);font-weight:500;margin-left:6px}.save-b{background:#FDEBD0;color:#6B4A08;margin-left:6px}
+@media(max-width:400px){.disc{grid-template-columns:minmax(0,1fr)}}
+.err{color:var(--red);font-weight:700;margin-top:10px}
+.imgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:8px;margin-top:8px}
+.imgs figure{margin:0;border:1.5px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;position:relative}
+.imgs figure.cov{border-color:var(--green)}
+.imgs img{width:100%;height:96px;object-fit:cover;display:block;background:#EFE6D2}
+.imgs .cb{position:absolute;top:6px;left:6px;background:var(--green);color:var(--cream);font-size:11px;font-weight:700;border-radius:999px;padding:2px 8px}
+.imgs .ia{display:flex;gap:4px;padding:4px}.imgs .ia button{flex:1;min-height:44px;border-radius:9px;border:1.5px solid var(--line);background:#fff;font-weight:700;font-size:13px;cursor:pointer;padding:4px}
+.imgs .ia button:disabled{opacity:.5;cursor:not-allowed}
+.img-st{font-size:13px;margin-top:6px}.img-st:empty{display:none}
+code{background:#F3EEE2;padding:2px 6px;border-radius:6px;font-size:13px}
+pre{background:#F3EEE2;padding:12px;border-radius:10px;overflow:auto;font-size:13px}
+.toggle{display:flex;align-items:center;gap:10px;margin-top:12px;font-weight:700}
+.toggle input{width:20px;height:20px;accent-color:var(--green)}
+#wa-box code{word-break:break-all}
+.wa-num{font-family:'Bricolage Grotesque';font-weight:800;font-size:26px;color:var(--green);margin-top:6px}
+.seg{display:flex;gap:4px;background:#F3EEE2;border-radius:12px;padding:4px;margin-top:10px;flex-wrap:wrap}
+.seg button{flex:1;border:0;background:transparent;border-radius:9px;padding:9px 10px;font-weight:700;cursor:pointer;min-height:40px;color:var(--muted)}
+.seg button[aria-selected=true]{background:#fff;color:var(--green);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.phone-row{display:grid;grid-template-columns:90px 1fr;gap:10px}
+.found{background:#EEF6F0;border:1px solid #CFE3D5;border-radius:10px;padding:10px 12px;margin-top:12px}
+.wa-steps{display:flex;gap:6px;list-style:none;padding:0;margin:12px 0;flex-wrap:wrap}
+.wa-steps li{flex:1;min-width:90px;padding:8px 10px;border-radius:10px;background:#F3EEE2;color:var(--muted);font-weight:700;font-size:13px;text-align:center}
+.tpl{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-top:10px}
+.tpl button{text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;cursor:pointer;min-height:44px}
+.tpl button:hover,.tpl button:focus-visible{border-color:var(--green);background:#F3F8F4}
+.tpl button b{display:block}.tpl button span{display:block;font-size:13px;color:var(--muted);margin-top:2px}
+.oe-line{display:grid;grid-template-columns:1fr 84px 40px;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.oe-line .x{width:40px;height:40px;border-radius:10px;border:1.5px solid var(--line);background:#fff;font-size:20px;cursor:pointer}
+.oe-add{background:#F8F4EA;border:1px dashed var(--line);border-radius:12px;padding:12px;margin-top:12px}
+.oe-opt{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:6px}
+.oe-opt label{display:flex;align-items:center;gap:6px}
+table.cust{width:100%;border-collapse:collapse;font-size:15px}
+table.cust th{text-align:left;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:8px 10px;border-bottom:1.5px solid var(--line)}
+table.cust td{padding:10px;border-bottom:1px solid var(--line);vertical-align:top}
+.cust-wrap{overflow-x:auto}
+.poster{background:#fff;color:#143D27;border:1px solid var(--line);border-radius:18px;max-width:560px;margin:0 auto;padding:36px 32px;text-align:center}
+.poster img.logo{width:84px;height:84px}
+.poster .pn{font-family:'Bricolage Grotesque';font-weight:800;font-size:44px;letter-spacing:-.03em;line-height:1;margin-top:8px}
+.poster .pn span{color:#B8760F}
+.poster .pt{color:#55655B;margin-top:6px;font-size:17px}
+.poster h2{font-size:34px;line-height:1.05;margin:26px 0 4px;color:#1F5C3A}
+.poster .qrs{display:flex;gap:28px;justify-content:center;flex-wrap:wrap;margin-top:22px}
+.poster .qr{flex:1;min-width:200px;max-width:300px}
+.poster .qr img{width:100%;aspect-ratio:1;display:block;border:10px solid #fff;outline:2px solid #1F5C3A;border-radius:14px}
+.poster .qr b{display:block;font-size:20px;margin-top:12px}
+.poster .qr small{display:block;color:#55655B;font-size:14px;margin-top:2px;word-break:break-all}
+.poster .foot{margin-top:26px;font-size:15px;color:#55655B}
+@media print{
+  @page{margin:12mm}
+  body{background:#fff!important}
+  .top,.toast,#tab-poster .noprint{display:none!important}
+  main{padding:0!important;max-width:none!important}
+  .poster{border:0;max-width:none;padding:10mm 0}
+  .poster .qr img{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+.wa-steps li.now{background:#FFF4DE;color:#6B4A08}.wa-steps li.done{background:#E3F0E6;color:var(--green)}
+/* mobile */
+html,body{overflow-x:hidden}
+@supports(overflow:clip){html,body{overflow-x:clip}}
+img{max-width:100%}
+.top .in,main{padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+main{padding-bottom:calc(80px + env(safe-area-inset-bottom))}
+.toast{bottom:calc(18px + env(safe-area-inset-bottom));max-width:calc(100vw - 32px);text-align:center}
+.order .cols>div,.order .hd{min-width:0;overflow-wrap:anywhere}
+@media(max-width:760px){
+ html,body{font-size:16px}
+ .t,input,select,textarea{font-size:16px}
+ .btn,.x,.tabs button,.seg button{min-height:44px}
+ .top .in{padding-top:10px;padding-bottom:0;gap:10px}
+ .tabs{order:3;width:100%;margin:0 -16px;padding:0 16px 8px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity}
+ .tabs::-webkit-scrollbar{display:none}
+ .tabs button{flex:none;white-space:nowrap;scroll-snap-align:start}
+ #logout{margin-left:auto}
+ main{padding-top:16px}
+ main h2{font-size:23px!important}
+ .card{padding:14px;border-radius:14px}
+ .login{margin:8vh auto;padding:0 16px}
+ #statusFilter{flex:1;min-width:0}
+ #custSearch{min-width:0!important;width:100%!important;flex-basis:100%!important}
+ .order .hd .muted{margin-left:0!important;flex-basis:100%;font-size:14px}
+ .order .acts>.btn{flex:1 1 auto;justify-content:center}
+ .order .acts select{flex:1;min-width:0}
+ .oe-line{grid-template-columns:1fr 72px 44px}
+ .oe-line .x{width:44px;height:44px}
+ .oe-opt label{min-height:44px}
+ .oe-opt input,.toggle input{width:22px;height:22px}
+ .toggle{min-height:44px;margin-top:8px}
+ .ch{grid-template-columns:1fr 92px 44px}
+ .items{grid-template-columns:1fr}
+ .tpl{grid-template-columns:1fr 1fr}
+ .phone-row{grid-template-columns:84px 1fr}
+ .poster{padding:24px 16px}.poster .pn{font-size:34px}.poster h2{font-size:27px}
+ .poster .qr{min-width:0;flex-basis:100%}
+ .cust-wrap{overflow:visible;padding:0;background:transparent;border:0}
+ table.cust,table.cust tbody,table.cust tr,table.cust td{display:block;width:100%}
+ table.cust thead{display:none}
+ table.cust tr{background:#fff;border:1px solid var(--line);border-radius:14px;padding:6px 14px;margin-bottom:10px}
+ table.cust td{display:flex;justify-content:space-between;gap:12px;padding:7px 0;text-align:right;overflow-wrap:anywhere}
+ table.cust td:last-child{border-bottom:0}
+ table.cust td::before{content:attr(data-label);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700;text-align:left;flex:none}
+ table.cust td:first-child{font-size:17px}
+ .cust-wrap>p{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;margin:0}
+}
+@media(max-width:400px){
+ .grid2 .grid2{grid-template-columns:1fr}
+ .tpl{grid-template-columns:1fr}
+ .order .acts>*{flex-basis:100%}
+ .top .nm{font-size:20px}
+}
+@media(max-width:640px){.og .grid2 .toggle{margin-top:8px!important}}
+.set-tabs{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;background:#F3EEE2;border-radius:14px;padding:4px;margin-bottom:12px}
+.set-tabs button{border:0;background:transparent;border-radius:10px;padding:8px 6px;min-height:44px;font-weight:700;color:var(--muted);cursor:pointer;min-width:0;overflow-wrap:anywhere;line-height:1.15}
+.set-tabs button[aria-selected=true]{background:#fff;color:var(--green);box-shadow:0 1px 2px rgba(20,61,39,.12)}
+.set-tabs button:focus-visible,.set-panel:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+.set-panel[hidden]{display:none}.set-card{max-width:760px}
+.set-h{font-size:19px}.set-d{margin:3px 0 4px}.set-sub{margin:18px 0 0;font-size:15px}
+.set-acts{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}.set-note{font-size:13px;margin:8px 0 0}
+.set-split{border-top:1px solid var(--line);margin-top:18px;padding-top:16px}
+.set-keys h3{display:none}.set-keys>p:first-child{margin-top:0}
+.set-heading{display:flex;align-items:center;gap:12px;justify-content:space-between;margin-bottom:12px}.set-heading h2{font-size:26px;margin:0}.set-select{display:none}
+.set-closed summary{min-height:44px;display:list-item;cursor:pointer;padding:12px 0;font-weight:700;font-size:14px}
+@media(max-width:480px){.set-tabs{display:none!important}.set-select{display:block;width:155px;min-width:0;min-height:44px;font-size:16px}.set-heading h2{font-size:23px}.set-card{padding:14px}.set-panel .f{margin-top:12px}}
+@media(max-width:760px){.set-tabs{grid-template-columns:repeat(3,minmax(0,1fr))}.set-acts>.btn{flex:1 1 auto;justify-content:center}}
+.pay-b{background:#F3EEE2;color:var(--muted)}.pay-b.paid{background:#E3F0E6;color:var(--green)}.pay-b.pend{background:#FFF4DE;color:#6B4A08}
+.pay-warn{background:#FBE3DE;border:1px solid #E7C2B8;color:#7A2717;border-radius:10px;padding:10px 12px;font-size:14px;font-weight:700;margin-top:10px}
+.pager{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:6px 0 14px}
+.pager .info{flex:1;text-align:center;font-weight:700;font-size:14px;min-width:0}
+.pager .info small{display:block;font-weight:500;color:var(--muted)}
+.pager .btn{min-height:44px}.pager select{width:auto;min-height:44px}
+.rcpt{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.rcpt select{width:auto;min-height:44px}
+.rcpt-err:empty{display:none}.rcpt-err{flex-basis:100%;margin-top:4px;font-size:13px}
+.rcpt-note{flex-basis:100%;font-size:12px;color:var(--muted)}
+.o-err{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#FBE3DE;border:1px solid #E7C2B8;color:#7A2717;border-radius:12px;padding:10px 12px;font-weight:700;margin-bottom:12px}
+.o-err[hidden]{display:none}
+.sk{height:140px;border-radius:16px;background:linear-gradient(90deg,#F3EEE2,#FBF7EE,#F3EEE2);background-size:200% 100%;animation:sk 1.2s linear infinite;margin-bottom:12px}
+@keyframes sk{to{background-position:-200% 0}}
+@media(max-width:520px){.pager .info{order:-1;flex-basis:100%}.pager .btn{flex:1;justify-content:center}.rcpt{flex-basis:100%}.rcpt select{flex:1;min-width:0}}
+</style>
+</head>
+<body>
+<div id="loginView" class="login" hidden>
+  <img src="/logo.svg" alt="" width="70" height="70">
+  <h1 style="margin-top:10px;color:var(--green)">GrinFud Admin</h1>
+  <form id="loginForm" class="card" style="margin-top:18px;text-align:left">
+    <label class="f" for="pw">Password</label><input class="t" id="pw" type="password" autocomplete="current-password" required>
+    <button class="btn btn-p" style="width:100%;justify-content:center;margin-top:14px">Log in</button>
+    <div class="err" id="loginErr"></div>
+  </form>
+</div>
+
+<div id="app" hidden>
+  <div class="top"><div class="in">
+    <img src="/logo-light.svg" alt=""><div class="nm">Grin<span>Fud</span> admin</div>
+    <nav class="tabs" role="tablist">
+      <button role="tab" data-tab="orders" aria-selected="true">Orders <span id="newCount"></span></button>
+      <button role="tab" data-tab="menu" aria-selected="false">Menu</button>
+      <button role="tab" data-tab="customers" aria-selected="false">Customers</button>
+      <button role="tab" data-tab="poster" aria-selected="false">Poster</button>
+      <button role="tab" data-tab="settings" aria-selected="false">Settings</button>
+      <button id="logout">Log out</button>
+    </nav>
+  </div></div>
+  <main>
+    <section id="tab-orders">
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
+        <h2 style="font-size:26px">Orders</h2>
+        <select class="t" id="statusFilter" style="width:auto;margin-left:auto">
+          <option value="">All orders</option><option value="new">New</option><option value="preparing">Preparing</option>
+          <option value="out_for_delivery">Out for delivery</option><option value="delivered">Delivered</option><option value="cancelled">Cancelled</option>
+        </select>
+        <a class="btn btn-o" href="/" target="_blank" rel="noopener">Open order page ↗</a>
+      </div>
+      <div id="customerOrderFilter" class="card" hidden style="margin-bottom:12px">
+        <strong id="customerOrderLabel"></strong>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+          <a class="btn btn-o" href="#" id="allCustomerOrders" style="min-height:44px">Show all orders</a>
+          <button class="btn btn-o" id="backToCustomers" style="min-height:44px">Back to customers</button>
+        </div>
+      </div>
+      <div class="o-err" id="ordersErr" role="alert" hidden><span id="ordersErrMsg"></span><button class="btn btn-o" id="ordersRetry" style="margin-left:auto">Retry</button></div>
+      <div id="orders"><div class="sk"></div><div class="sk"></div></div>
+      <div id="pager"></div>
+    </section>
+    <section id="tab-menu" hidden>
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:14px"><h2 style="font-size:26px">Menu</h2><button class="btn btn-g" id="newItem" style="margin-left:auto">+ Add item</button></div>
+      <div id="editor" class="card" hidden style="margin-bottom:16px"></div>
+      <div id="items" class="items"></div>
+    </section>
+    <section id="tab-customers" hidden>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px"><h2 style="font-size:26px">Customers <span class="muted" id="custCount" style="font-size:16px"></span></h2>
+        <input class="t" id="custSearch" type="search" placeholder="Search number, name or nickname" aria-label="Search customers" style="width:auto;flex:1;min-width:200px;margin-left:auto"></div>
+      <div class="card cust-wrap" id="customers"></div>
+    </section>
+    <section id="tab-poster" hidden></section>
+    <section id="tab-settings" hidden></section>
+  </main>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="/admin-provider-keys.js"></script>
+<script src="/admin-poster.js"></script>
+<script src="/payment.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+// Tracking is always on this site, even if a cached response has an old host.
+function customerTrackingPath(value) {
+  try {
+    const path = new URL(value, location.href).pathname;
+    return /^\/t\/[A-Za-z0-9_-]{16,40}$/.test(path) ? path : '';
+  } catch { return ''; }
+}
+const STATUS = { new: 'New', preparing: 'Preparing', out_for_delivery: 'Out for delivery', delivered: 'Delivered', cancelled: 'Cancelled' };
+let S = {}, items = [], lastNewIds = null, orderList = [], editingOrder = null;
+const money = n => `${S.currency || 'KSh'} ${Number(n || 0).toLocaleString('en-KE')}`;
+function toast(m) { const t = $('#toast'); t.textContent = m; t.style.display = 'block'; clearTimeout(t._h); t._h = setTimeout(() => t.style.display = 'none', 2600); }
+async function api(url, opt = {}) {
+  const r = await fetch(url, { ...opt, headers: { ...(opt.body && !(opt.body instanceof FormData) ? { 'Content-Type': 'application/json' } : {}), ...(opt.headers || {}) } });
+  if (r.status === 401 && !url.endsWith('/login')) { showLogin(); throw new Error('Please log in.'); }
+  const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || 'Request failed'); return d;
+}
+function showLogin() { $('#app').hidden = true; $('#loginView').hidden = false; }
+async function start() { $('#loginView').hidden = true; $('#app').hidden = false; S = await api('/api/admin/settings'); loadOrders(); loadItems(); renderSettings(); setInterval(loadOrders, 20000); }
+$('#loginForm').onsubmit = async e => { e.preventDefault(); $('#loginErr').textContent = '';
+  try { await api('/api/admin/login', { method: 'POST', body: JSON.stringify({ password: $('#pw').value }) }); start(); } catch (x) { $('#loginErr').textContent = x.message; } };
+$('#logout').onclick = async () => { await api('/api/admin/logout', { method: 'POST' }); location.reload(); };
+document.querySelectorAll('.tabs [data-tab]').forEach(b => b.onclick = () => {
+  document.querySelectorAll('.tabs [data-tab]').forEach(x => x.setAttribute('aria-selected', x === b));
+  ['orders', 'menu', 'customers', 'poster', 'settings'].forEach(t => $('#tab-' + t).hidden = t !== b.dataset.tab);
+  if (b.dataset.tab === 'customers') loadCustomers();
+  if (b.dataset.tab === 'poster') renderPoster();
+  if (b.dataset.tab === 'settings' && setGroup === 'whatsapp') loadWhatsApp();
+});
+
+// ---- orders ----
+function chime() { try { const a = new AudioContext(), o = a.createOscillator(), g = a.createGain(); o.frequency.value = 880; o.connect(g); g.connect(a.destination); g.gain.setValueAtTime(.2, a.currentTime); g.gain.exponentialRampToValueAtTime(.001, a.currentTime + .6); o.start(); o.stop(a.currentTime + .6); } catch {} }
+let oPage = 1, oSize = [10, 20, 50].includes(Number(localStorage.getItem('gf_ps'))) ? Number(localStorage.getItem('gf_ps')) : 10, oSeq = 0, oTotal = 0, lastLatestNew = null;
+const customerFromHash = () => location.hash.match(/^#customer-orders=(254[17]\d{8})$/)?.[1] || '';
+let oCustomer = customerFromHash();
+function syncCustomerFilter() {
+  $('#customerOrderFilter').hidden = !oCustomer;
+  $('#customerOrderLabel').textContent = oCustomer ? 'Orders for +' + oCustomer : '';
+}
+window.addEventListener('hashchange', () => {
+  oCustomer = customerFromHash(); oPage = 1; $('#statusFilter').value = '';
+  syncCustomerFilter();
+  document.querySelector('.tabs [data-tab="orders"]').click();
+  loadOrders();
+});
+$('#backToCustomers').onclick = () => document.querySelector('.tabs [data-tab="customers"]').click();
+$('#allCustomerOrders').onclick = e => {
+  e.preventDefault(); history.replaceState(null, '', location.pathname + location.search);
+  oCustomer = ''; oPage = 1; $('#statusFilter').value = ''; syncCustomerFilter(); loadOrders();
+};
+function receiptPicker(o) {
+  const t = GFReceipt.types(o.receipt_types), code = o.code;
+  return `<div class="rcpt" data-rcpt-box><select class="t" data-rsel="${esc(code)}" aria-label="Receipt type for ${esc(code)}">${t.map(k => `<option value="${k}">${esc(GFReceipt.LABEL[k].replace(' PDF', ''))}</option>`).join('')}</select>
+    <a class="btn btn-o" data-receipt="${esc(t[0])}-${esc(code)}.pdf" href="${esc(GFReceipt.adminUrl(code, t[0]))}">Download PDF</a>
+    ${o.payment_status !== 'completed' ? '<span class="rcpt-note">Order PDF is not proof of payment.</span>' : ''}<span class="rcpt-err err"></span></div>`;
+}
+function renderPager(d) {
+  if (!d.total) { $('#pager').innerHTML = ''; return; }
+  const from = (d.page - 1) * d.page_size + 1, to = Math.min(d.total, from + d.orders.length - 1);
+  $('#pager').innerHTML = `<nav class="pager" aria-label="Orders pages"><button class="btn btn-o" data-pg="-1" ${d.page <= 1 ? 'disabled' : ''} aria-label="Previous page">‹ Prev</button>
+    <div class="info" aria-live="polite">Page ${d.page} of ${Math.max(1, d.pages)}<small>${from}–${to} of ${d.total}</small></div>
+    <button class="btn btn-o" data-pg="1" ${d.page >= d.pages ? 'disabled' : ''} aria-label="Next page">Next ›</button>
+    <select class="t" id="pageSize" aria-label="Orders per page">${[10, 20, 50].map(n => `<option value="${n}" ${n === oSize ? 'selected' : ''}>${n} / page</option>`).join('')}</select></nav>`;
+}
+async function loadOrders() {
+  if (editingOrder) return; // don't redraw the list under an open editor
+  const seq = ++oSeq, st = $('#statusFilter').value;
+  syncCustomerFilter();
+  const q = new URLSearchParams({ page: oPage, page_size: oSize }); if (st) q.set('status', st);
+  if (oCustomer) q.set('customer_phone', oCustomer);
+  let d;
+  try { d = await api('/api/admin/orders?' + q); }
+  catch (x) { if (seq !== oSeq) return; $('#ordersErrMsg').textContent = 'Could not load orders: ' + x.message; $('#ordersErr').hidden = false; if ($('#orders .sk')) $('#orders').innerHTML = ''; return; }
+  if (seq !== oSeq || editingOrder) return; // a newer request (or editor) owns the screen
+  $('#ordersErr').hidden = true;
+  if (Array.isArray(d)) d = { orders: d, page: 1, page_size: d.length || oSize, total: d.length, pages: 1, new_count: d.filter(o => o.status === 'new').length, latest_new_id: null };
+  d.orders = d.orders || []; d.pages = Number(d.pages) || 0; d.page = Number(d.page) || oPage; d.page_size = Number(d.page_size) || oSize; d.total = Number(d.total) || 0;
+  if (d.pages && oPage > d.pages) { oPage = d.pages; return loadOrders(); } // last page emptied
+  if (!d.pages && oPage > 1) { oPage = 1; return loadOrders(); }
+  oPage = d.page; oTotal = d.total;
+  if (typeof d.latest_new_id === 'number') { // global, independent of the page being viewed
+    if (lastLatestNew != null && d.latest_new_id > lastLatestNew) { chime(); toast('New order received'); }
+    lastLatestNew = Math.max(lastLatestNew || 0, d.latest_new_id);
+  } else if (!st) {
+    const newIds = d.orders.filter(o => o.status === 'new').map(o => o.code);
+    if (lastNewIds && newIds.some(c => !lastNewIds.includes(c))) { chime(); toast('New order received'); }
+    lastNewIds = newIds;
+  }
+  const nc = Number(d.new_count) || 0; $('#newCount').textContent = nc ? `(${nc})` : '';
+  const list = orderList = d.orders;
+  $('#orders').innerHTML = list.length ? list.map(o => `
+    <article class="card order">
+      <div class="hd"><span class="code">${esc(o.code)}</span><span class="pill st-${o.status}">${STATUS[o.status]}</span>
+        <span class="pill" style="background:#F3EEE2">${o.source === 'whatsapp' ? 'WhatsApp bot' : 'Website'}</span>
+        ${o.payment_status !== undefined ? `<span class="pill pay-b ${PAY_BADGE(o.payment_status)[0]}" title="${esc(o.payment_receipt ? 'M-Pesa receipt ' + o.payment_receipt : 'M-Pesa')}">${PAY_BADGE(o.payment_status)[1]}${o.payment_receipt ? ' · ' + esc(o.payment_receipt) : ''}</span>` : ''}
+        <span class="muted" style="margin-left:auto">${esc(new Date(o.created_at.replace(' ', 'T') + 'Z').toLocaleString('en-KE', { dateStyle: 'medium', timeStyle: 'short' }))}</span></div>
+      <div class="cols">
+        <div><b>${esc(o.customer_name)}</b> · <a href="tel:+${esc(o.phone)}">+${esc(o.phone)}</a> · <a href="https://wa.me/${esc(o.phone)}" target="_blank" rel="noopener">WhatsApp</a>
+          <div class="muted">📍 ${esc(o.location)}${o.map_link ? ` · <a href="${esc(o.map_link)}" target="_blank" rel="noopener">Open pin on map</a>` : ''}</div>
+          ${o.delivery_date || o.delivery_time ? `<div class="muted">🕖 ${esc([o.delivery_date, o.delivery_time].filter(Boolean).join(', '))}</div>` : ''}
+          ${o.notes ? `<div style="margin-top:6px">✎ ${esc(o.notes)}</div>` : ''}</div>
+        <div><ul>${o.items.map(it => `<li><b>${it.qty} × ${esc(it.name)}</b> — ${money(it.line_total)}${it.options.length ? `<br><span class="muted">${it.options.map(op => esc(op.group + ': ' + op.choice)).join(' · ')}</span>` : ''}${it.note ? `<br><span class="muted">✎ ${esc(it.note)}</span>` : ''}</li>`).join('')}</ul>
+          <div style="margin-top:6px">${o.delivery_fee ? `Delivery ${money(o.delivery_fee)} · ` : ''}<b>Total ${money(o.total)}</b></div></div>
+      </div>
+      ${!o.notified ? `<div class="warn">Kitchen not notified automatically${o.notify_error ? ': ' + esc(o.notify_error) : ''}.</div>` : ''}
+      ${o.sms_status === 'sent' ? '<div class="muted" style="margin-top:8px">📩 SMS alert sent</div>' : o.sms_status ? `<div class="warn">SMS alert ${esc(o.sms_status)}</div>` : ''}
+      <div class="acts">
+        <button class="btn btn-o" data-editorder="${esc(o.code)}">Edit order</button>
+        ${customerTrackingPath(o.track_url) ? `<a class="btn btn-o" href="${esc(customerTrackingPath(o.track_url))}" target="_blank" rel="noopener">Customer's tracking page ↗</a>` : ''}
+        <label class="muted" for="s-${esc(o.code)}">Status</label>
+        <select class="t" id="s-${esc(o.code)}" data-status="${esc(o.code)}" style="width:auto">${Object.entries(STATUS).map(([k, v]) => `<option value="${k}" ${k === o.status ? 'selected' : ''}>${v}</option>`).join('')}</select>
+        ${receiptPicker(o)}
+        <a class="btn btn-o" href="${esc(o.kitchen_link)}" target="_blank" rel="noopener">Send to kitchen on WhatsApp</a>
+        ${S.notify_configured ? `<button class="btn btn-o" data-renotify="${esc(o.code)}">Re-send automatically</button>` : ''}
+      </div>
+    </article>`).join('') : (oTotal ? '<p class="muted">Nothing on this page.</p>' : $('#statusFilter').value ? '<p class="muted">No orders with this status.</p>' : '<p class="muted">No orders yet. They appear here as soon as someone orders on the website or WhatsApp.</p>');
+  renderPager(d);
+}
+$('#statusFilter').onchange = () => { oPage = 1; loadOrders(); };
+$('#ordersRetry').onclick = loadOrders;
+$('#pager').addEventListener('click', e => { const b = e.target.closest('[data-pg]'); if (!b || b.disabled) return; oPage = Math.max(1, oPage + Number(b.dataset.pg)); loadOrders(); $('#tab-orders').scrollIntoView({ block: 'start' }); });
+$('#pager').addEventListener('change', e => { if (e.target.id !== 'pageSize') return; oSize = Number(e.target.value) || 10; try { localStorage.setItem('gf_ps', oSize); } catch {} oPage = 1; loadOrders(); });
+$('#orders').addEventListener('change', e => { const c = e.target.dataset.rsel; if (!c) return; const a = e.target.parentNode.querySelector('a[data-receipt]');
+  a.href = GFReceipt.adminUrl(c, e.target.value); a.dataset.receipt = e.target.value + '-' + c + '.pdf'; });
+$('#orders').addEventListener('change', async e => { const c = e.target.dataset.status; if (!c) return;
+  try { await api('/api/admin/orders/' + c, { method: 'PATCH', body: JSON.stringify({ status: e.target.value }) }); toast(`${c}: ${STATUS[e.target.value]}`); loadOrders(); } catch (x) { toast(x.message); } });
+$('#orders').addEventListener('click', e => { const c = e.target.dataset.editorder; if (c) openOrderEditor(orderList.find(o => o.code === c), e.target.closest('.order')); });
+// The whole order can be changed: who, where, when, notes, the delivery fee and the items.
+// Existing lines keep the price the customer was quoted; to change an item's options, remove the line and add it again.
+function openOrderEditor(o, card) {
+  if (!o || !card) return; editingOrder = o.code;
+  const d = { customer_name: o.customer_name, phone: '0' + String(o.phone).slice(3), location: o.location, delivery_date: o.delivery_date, delivery_time: o.delivery_time, notes: o.notes, delivery_fee: o.delivery_fee,
+    lines: o.items.map((it, i) => ({ keep: i, name: it.name, qty: it.qty, unit: it.unit_price, note: it.note || '', opts: it.options.map(op => op.choice).join(', ') })) };
+  let addId = items[0] ? items[0].id : null, addOpts = {}, addQty = 1;
+  const askOf = it => it.order_options || it.options;
+  const unitOf = (it, opts) => Number(it.sale_price ?? it.price) + askOf(it).reduce((n, g) => n + g.choices.filter(c => (opts[g.name] || []).includes(c.label)).reduce((m, c) => m + c.price, 0), 0);
+  const subtotal = () => d.lines.reduce((n, l) => n + l.unit * (Number(l.qty) || 0), 0);
+  const pull = () => {
+    for (const k of ['customer_name', 'phone', 'location', 'delivery_date', 'delivery_time', 'notes', 'delivery_fee']) d[k] = card.querySelector(`[data-f="${k}"]`).value;
+    card.querySelectorAll('[data-lq]').forEach(x => d.lines[x.dataset.lq].qty = x.value);
+    card.querySelectorAll('[data-ln]').forEach(x => d.lines[x.dataset.ln].note = x.value);
+    const q = card.querySelector('#oe-qty'); if (q) addQty = q.value;
+  };
+  const draw = () => {
+    const it = items.find(i => i.id == addId);
+    card.innerHTML = `<div class="hd"><span class="code">${esc(o.code)}</span><span class="pill" style="background:#FFF4DE;color:#6B4A08">Editing</span></div>
+      <div class="grid2"><div><label class="f">Customer name</label><input class="t" data-f="customer_name" value="${esc(d.customer_name)}" maxlength="80"></div>
+        <div><label class="f">Phone</label><input class="t" data-f="phone" value="${esc(d.phone)}" inputmode="tel"></div></div>
+      <label class="f">Delivery location</label><textarea class="t" data-f="location" rows="2" maxlength="300">${esc(d.location)}</textarea>
+      <div class="grid2"><div><label class="f">Delivery date</label><input class="t" data-f="delivery_date" type="date" value="${esc(d.delivery_date)}"></div>
+        <div><label class="f">Delivery time</label><input class="t" data-f="delivery_time" value="${esc(d.delivery_time)}" maxlength="60"></div></div>
+      <div class="grid2"><div><label class="f">Notes</label><input class="t" data-f="notes" value="${esc(d.notes)}" maxlength="500"></div>
+        <div><label class="f">Delivery fee (${esc(S.currency)})</label><input class="t" data-f="delivery_fee" type="number" min="0" value="${esc(d.delivery_fee)}"></div></div>
+      <h4 style="margin:18px 0 4px">Items</h4>
+      ${d.lines.length ? d.lines.map((l, i) => `<div class="oe-line"><div><b>${esc(l.name)}</b> <span class="muted">${money(l.unit)} each${l.opts ? ' · ' + esc(l.opts) : ''}</span>
+          <input class="t" data-ln="${i}" value="${esc(l.note)}" placeholder="Note for this item (optional)" aria-label="Note for ${esc(l.name)}" maxlength="200" style="margin-top:6px;min-height:38px;padding:6px 10px"></div>
+        <input class="t" data-lq="${i}" type="number" min="1" max="50" value="${esc(l.qty)}" aria-label="Quantity of ${esc(l.name)}">
+        <button class="x" data-lrm="${i}" aria-label="Remove ${esc(l.name)}">×</button></div>`).join('') : '<p class="muted">No items. Add at least one below.</p>'}
+      ${items.length ? `<div class="oe-add"><b>Add an item</b>
+        <div class="grid2" style="margin-top:6px"><select class="t" id="oe-item" aria-label="Item">${items.map(i => `<option value="${i.id}" ${i.id == addId ? 'selected' : ''}>${esc(i.name)} — ${money(i.sale_price ?? i.price)}${Number(i.sale_price ?? i.price) < Number(i.price) ? ' (was ' + money(i.price) + ')' : ''}${i.available ? '' : ' (hidden)'}</option>`).join('')}</select>
+          <div style="display:flex;gap:8px"><input class="t" id="oe-qty" type="number" min="1" max="50" value="${esc(addQty)}" aria-label="Quantity" style="width:84px"><button type="button" class="btn btn-g" id="oe-addbtn" style="flex:1;justify-content:center">Add to order</button></div></div>
+        ${it ? askOf(it).map((g, gi) => `<div style="margin-top:10px"><span class="muted">${esc(g.name)}${g.required ? ' (required)' : ''}</span><div class="oe-opt">${g.choices.map((c, ci) =>
+          `<label><input type="${g.type === 'multi' ? 'checkbox' : 'radio'}" name="oe-g${gi}" data-og="${gi}" data-oc="${ci}" ${(addOpts[g.name] || []).includes(c.label) ? 'checked' : ''}> ${esc(c.label)}${c.price ? ` (+${money(c.price)})` : ''}</label>`).join('')}</div></div>`).join('') : ''}</div>` : ''}
+      <div style="margin-top:14px;font-size:18px"><b>New total: ${money(subtotal() + (Number(d.delivery_fee) || 0))}</b> <span class="muted" style="font-size:14px">(was ${money(o.total)})</span></div>
+      <div class="err" id="oe-err"></div>
+      <div class="acts"><button class="btn btn-p" id="oe-save">Save changes</button><button class="btn btn-o" id="oe-cancel">Cancel</button></div>`;
+  };
+  const close = () => { editingOrder = null; loadOrders(); };
+  draw();
+  card.oninput = e => { if (e.target.dataset.lq != null || e.target.dataset.f === 'delivery_fee') { pull(); const pos = e.target.dataset.lq, f = e.target.dataset.f; draw(); const el = card.querySelector(pos != null ? `[data-lq="${pos}"]` : `[data-f="${f}"]`); el.focus(); } };
+  card.onchange = e => {
+    const t = e.target;
+    if (t.id === 'oe-item') { pull(); addId = t.value; addOpts = {}; draw(); return; }
+    if (t.dataset.og != null) { const it = items.find(i => i.id == addId), g = askOf(it)[t.dataset.og], c = g.choices[t.dataset.oc];
+      if (g.type === 'multi') { const set = new Set(addOpts[g.name] || []); t.checked ? set.add(c.label) : set.delete(c.label); addOpts[g.name] = [...set]; } else addOpts[g.name] = [c.label]; }
+  };
+  card.onclick = async e => {
+    const t = e.target;
+    if (t.id === 'oe-cancel') return close();
+    if (t.dataset.lrm != null) { pull(); d.lines.splice(t.dataset.lrm, 1); draw(); return; }
+    if (t.id === 'oe-addbtn') { pull(); const it = items.find(i => i.id == addId); const er = card.querySelector('#oe-err');
+      const miss = askOf(it).find(g => g.required && !(addOpts[g.name] || []).length); if (miss) { er.textContent = `Please choose: ${miss.name}`; return; }
+      const qty = Math.round(Number(addQty)); if (!(qty >= 1 && qty <= 50)) { er.textContent = 'Quantity must be between 1 and 50.'; return; }
+      d.lines.push({ item_id: it.id, name: it.name, qty, unit: unitOf(it, addOpts), note: '', options: addOpts, opts: Object.values(addOpts).flat().join(', ') });
+      addOpts = {}; addQty = 1; draw(); return; }
+    if (t.id === 'oe-save') { pull(); t.disabled = true;
+      try { await api('/api/admin/orders/' + o.code, { method: 'PUT', body: JSON.stringify({ customer_name: d.customer_name, phone: d.phone, location: d.location, delivery_date: d.delivery_date,
+          delivery_time: d.delivery_time, notes: d.notes, delivery_fee: d.delivery_fee,
+          items: d.lines.map(l => l.keep != null ? { keep: l.keep, qty: Number(l.qty), note: l.note } : { item_id: l.item_id, qty: Number(l.qty), options: l.options, note: l.note }) }) });
+        toast(`${o.code} updated`); close(); }
+      catch (x) { card.querySelector('#oe-err').textContent = x.message; t.disabled = false; } }
+  };
+}
+$('#orders').addEventListener('click', async e => { const c = e.target.dataset.renotify; if (!c) return;
+  const r = await api(`/api/admin/orders/${c}/renotify`, { method: 'POST' }); toast(r.ok ? 'Sent to kitchen' : r.error); loadOrders(); });
+
+// ---- menu ----
+async function loadItems() { items = await api('/api/admin/items'); renderItems(); }
+function discOf(i) { const t = i.discount_type === 'percent' || i.discount_type === 'fixed' ? i.discount_type : 'none'; return { t, v: t === 'none' ? 0 : Math.max(0, Math.round(Number(i.discount_value) || 0)) }; }
+function salePrice(price, t, v) { const p = Math.max(0, Math.round(Number(price) || 0)); if (t === 'percent') return Math.max(0, Math.round(p * (100 - Math.min(100, v)) / 100)); if (t === 'fixed') return Math.max(0, p - v); return p; }
+function discHtml(i) { const orig = Number(i.original_price ?? i.price) || 0, eff = Number(i.sale_price ?? i.price) || 0, { t, v } = discOf(i);
+  return `<b style="color:var(--ink)">${money(eff)}</b>${orig > eff ? `<s class="was">${money(orig)}</s><span class="pill save-b">${t === 'percent' ? v + '% off' : money(orig - eff) + ' off'}</span>` : ''}`; }
+function renderItems() {
+  $('#items').innerHTML = items.length ? items.map(i => `<div class="card it">
+    ${itemImages(i)[0] ? `<img src="${esc(itemImages(i)[0])}" alt="">` : '<div class="ph"></div>'}${itemImages(i).length > 1 ? `<div class="muted" style="font-size:13px;margin-top:4px">${itemImages(i).length} photos</div>` : ''}
+    <h3>${esc(i.name)}</h3><div class="muted">${esc(i.category)} · ${discHtml(i)}${i.unit ? ' / ' + esc(i.unit) : ''}</div>
+    <div class="muted" style="margin-top:4px">${[PREP_LABEL[i.prep], i.serves ? `Serves ${i.serves}` : '', i.min_qty > 1 ? `Min ${i.min_qty}` : ''].filter(Boolean).join(' · ') || 'Cooked or raw not set'}</div>
+    <div class="muted" style="margin-top:4px">${i.options.length ? i.options.map(g => esc(g.name)).join(' · ') : 'No extra questions'}</div>
+    <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button class="btn btn-o" data-edit="${i.id}">Edit</button>
+      <button class="btn btn-o" data-avail="${i.id}">${i.available ? 'Hide' : 'Show'}</button>
+      <span class="pill ${i.available ? 'st-delivered' : 'st-cancelled'}" style="align-self:center">${i.available ? 'On menu' : 'Hidden'}</span></div></div>`).join('')
+    : '<p class="muted">No items yet. Click “Add item”.</p>';
+}
+$('#items').addEventListener('click', async e => {
+  const ed = e.target.dataset.edit, av = e.target.dataset.avail;
+  if ((ed || av) && imgBusy) { toast('Wait for the photo upload to finish.'); return; }
+  if (ed) openEditor(items.find(i => i.id == ed));
+  if (av) { const i = items.find(x => x.id == av); await api('/api/admin/items/' + i.id, { method: 'PUT', body: JSON.stringify({ ...i, available: !i.available }) }); loadItems(); }
+});
+$('#newItem').onclick = () => { if (imgBusy) { toast('Wait for the photo upload to finish.'); return; } openEditor(null); };
+const MAX_IMGS = 6, IMG_TYPES = ['image/jpeg', 'image/png', 'image/webp'], IMG_MAX = 6 * 1024 * 1024;
+let imgBusy = false;
+// images[] is primary; old items that only have `image` become a one-photo list.
+function itemImages(i) { return Array.isArray(i.images) ? i.images.filter(u => typeof u === 'string' && u) : (i.image ? [i.image] : []); }
+const PREP_LABEL = { cooked: 'Cooked', raw: 'Raw', both: 'Cooked or raw' };
+// Starting points for the things a kitchen serving offices and Airbnbs actually sells. Each one only pre-fills the form.
+const TEMPLATES = [
+  { label: '🍳 Cooked meal', hint: 'A plate or pack, ready to eat', d: { category: 'Meals', prep: 'cooked', unit: 'plate', serves: 1, min_qty: 1, options: [{ name: 'Extras', type: 'multi', required: false, choices: [{ label: 'Avocado', price: 50 }, { label: 'Extra portion', price: 150 }] }] } },
+  { label: '🥬 Raw produce', hint: 'Vegetables, fruit, tubers by the kg or bunch', d: { category: 'Fresh produce', prep: 'raw', unit: 'kg', serves: 0, min_qty: 1, options: [] } },
+  { label: '🥚 Cooked or raw', hint: 'Eggs, nduma, chicken: the buyer chooses', d: { category: 'Farm fresh', prep: 'both', cooked_extra: 50, unit: 'tray', serves: 0, min_qty: 1, options: [] } },
+  { label: '🏢 Office platter', hint: 'Feeds a team; order by the platter', d: { category: 'Office platters', prep: 'cooked', unit: 'platter', serves: 10, min_qty: 1, options: [{ name: 'Drinks', type: 'single', required: false, choices: [{ label: 'Tea flask', price: 300 }, { label: 'Fresh juice (2 L)', price: 500 }] }] } },
+  { label: '🏡 Airbnb welcome pack', hint: 'A stocked basket waiting for guests', d: { category: 'Airbnb packs', prep: 'both', cooked_extra: 200, unit: 'pack', serves: 2, min_qty: 1, options: [{ name: 'Guests', type: 'single', required: true, choices: [{ label: '2 guests', price: 0 }, { label: '4 guests', price: 600 }, { label: '6 guests', price: 1200 }] }] } },
+  { label: '🥤 Drink or snack', hint: 'Juice, yoghurt, mandazi by the piece', d: { category: 'Drinks & snacks', prep: 'cooked', unit: 'piece', serves: 1, min_qty: 1, options: [] } },
+];
+const UNITS = ['piece', 'plate', 'serving', 'pack', 'basket', 'platter', 'kg', 'bunch', 'tray', 'dozen', 'litre', 'crate'];
+function openEditor(it) {
+  const d = it ? JSON.parse(JSON.stringify(it)) : { name: '', description: '', price: '', category: '', image: '', available: true, sort: 0, options: [], prep: '', cooked_extra: 0, unit: '', serves: 0, min_qty: 1 };
+  if (it) d.price = it.original_price ?? it.price; // always edit the ORIGINAL price so discounts never compound
+  { const k = discOf(d); d.discount_type = k.t; d.discount_value = k.v; }
+  delete d.sale_price; delete d.original_price;
+  d.images = itemImages(d).slice(0, MAX_IMGS); d.image = d.images[0] || '';
+  let imgStatus = '', imgStatusErr = false, libraryOpen = false, libraryPhotos = [], libraryLoaded = false;
+  const selectedPhoto = p => d.images.some(u => {
+    try { return decodeURIComponent(new URL(u, location.href).pathname) === p.url; } catch { return u === p.url; }
+  });
+  const libraryHtml = () => `<button type="button" class="btn sm" id="e-library" aria-expanded="${libraryOpen}" ${imgBusy ? 'disabled' : ''}>${libraryOpen ? 'Close photo library' : 'Choose existing photos'}</button>
+    ${libraryOpen ? `<section aria-label="Photo library"><p class="muted" style="font-size:13px">Removing a photo from an item keeps the file. Only unused files can be permanently deleted.</p>
+    <button type="button" class="btn sm" id="e-refresh-photos" ${imgBusy ? 'disabled' : ''}>Refresh photos</button>
+    ${!libraryLoaded ? '<p role="status">Load the photo library to see uploaded photos.</p>' : !libraryPhotos.length ? '<p>No uploaded photos yet.</p>' : ''}
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;max-height:420px;overflow:auto;margin-top:8px">
+    ${libraryPhotos.map((p, n) => `<div style="min-width:0"><img src="${esc(p.url)}" alt="Uploaded photo ${n + 1}" loading="lazy" style="width:100%;height:100px;object-fit:cover;border-radius:8px">
+      <p style="font-size:12px;overflow-wrap:anywhere;margin:4px 0">${p.references.length ? 'Used by: ' + p.references.map(r => esc(r.name)).join(', ') : 'Unused'}${selectedPhoto(p) ? ' · Selected in this editor' : ''}</p>
+      <div style="display:flex;gap:4px;flex-wrap:wrap"><button type="button" class="btn sm" data-pick-photo="${n}" ${imgBusy || selectedPhoto(p) || d.images.length >= MAX_IMGS ? 'disabled' : ''}>${selectedPhoto(p) ? 'Selected' : 'Use photo'}</button>
+      <button type="button" class="btn sm" data-delete-photo="${n}" ${imgBusy || p.references.length || selectedPhoto(p) ? 'disabled' : ''}>Delete file</button></div></div>`).join('')}</div></section>` : ''}`;
+  const imgsHtml = () => `<label class="f" for="e-img">Photos <span class="muted" style="font-weight:500">(${d.images.length}/${MAX_IMGS} · first is the cover)</span></label>
+      <input class="t" id="e-img" type="file" multiple accept="image/jpeg,image/png,image/webp" ${imgBusy || d.images.length >= MAX_IMGS ? 'disabled' : ''}>
+      <p class="muted" style="font-size:13px;margin:4px 0 0">JPEG, PNG or WebP, up to 6 MB each.</p>
+      ${libraryHtml()}
+      <div class="img-st ${imgStatusErr ? 'err' : 'muted'}" role="status" aria-live="polite">${esc(imgStatus)}</div>
+      <div class="imgs">${d.images.map((u, k) => `<figure class="${k ? '' : 'cov'}"><img src="${esc(u)}" alt="Photo ${k + 1} of ${d.images.length}${k ? '' : ' (cover)'}">${k ? '' : '<span class="cb">Cover</span>'}
+        <div class="ia">${k ? `<button type="button" data-icov="${k}" ${imgBusy ? 'disabled' : ''} aria-label="Make photo ${k + 1} the cover">Make cover</button>` : ''}<button type="button" data-irm="${k}" ${imgBusy ? 'disabled' : ''} aria-label="Remove photo ${k + 1}">Remove</button></div></figure>`).join('')}</div>`;
+  const drawImgs = () => { const b = $('#e-imgs'); if (b) b.innerHTML = imgsHtml();
+    ['#e-save', '#e-cancel', '#e-del'].forEach(q => { const x = $(q); if (x) x.disabled = imgBusy; });
+    ed.querySelectorAll('[data-tpl]').forEach(x => x.disabled = imgBusy); $('#newItem').disabled = imgBusy; };
+  const setImgs = a => { d.images = a.slice(0, MAX_IMGS); d.image = d.images[0] || ''; };
+  const refreshPhotos = async () => {
+    imgBusy = true; drawImgs();
+    try { libraryPhotos = await api('/api/admin/photos'); libraryLoaded = true; }
+    catch (x) { imgStatus = x.message; imgStatusErr = true; }
+    finally { imgBusy = false; drawImgs(); }
+  };
+  const cats = [...new Set([...items.map(i => i.category), ...TEMPLATES.map(t => t.d.category), 'Breakfast', 'Lunch'].filter(Boolean))];
+  const ed = $('#editor'); ed.hidden = false; ed.scrollIntoView({ behavior: 'smooth' });
+  const draw = () => {
+    ed.innerHTML = `<h3 style="font-size:20px">${it ? 'Edit item' : 'New item'}</h3>
+    ${it ? '' : `<p class="muted" style="margin:6px 0 0">What are you adding? Pick the closest one to fill the form, then change anything.</p>
+      <div class="tpl">${TEMPLATES.map((t, i) => `<button type="button" data-tpl="${i}"><b>${t.label}</b><span>${t.hint}</span></button>`).join('')}</div>`}
+    <div class="grid2"><div><label class="f" for="e-name">What is it called?</label><input class="t" id="e-name" value="${esc(d.name)}" maxlength="120" placeholder="e.g. Chapati & beans, Kienyeji eggs, Team lunch platter"></div>
+      <div><label class="f" for="e-cat">Menu section</label><input class="t" id="e-cat" list="e-cats" value="${esc(d.category)}" maxlength="60" placeholder="e.g. Breakfast, Fresh produce, Office platters">
+        <datalist id="e-cats">${cats.map(c => `<option value="${esc(c)}">`).join('')}</datalist></div></div>
+    <div class="grid2"><div><label class="f" for="e-prep">Cooked or raw?</label><select class="t" id="e-prep">
+          <option value="" ${!d.prep ? 'selected' : ''}>Not applicable (drinks, packed goods)</option>
+          <option value="cooked" ${d.prep === 'cooked' ? 'selected' : ''}>Cooked — delivered ready to eat</option>
+          <option value="raw" ${d.prep === 'raw' ? 'selected' : ''}>Raw — fresh, the customer cooks it</option>
+          <option value="both" ${d.prep === 'both' ? 'selected' : ''}>Either — the customer chooses cooked or raw</option></select></div>
+      <div class="grid2"><div><label class="f" for="e-price">${d.prep === 'both' ? 'Raw price' : 'Price'} (${esc(S.currency)})</label><input class="t" id="e-price" type="number" min="0" value="${esc(d.price)}"></div>
+      <div><label class="f" for="e-unit">Sold per</label><input class="t" id="e-unit" list="e-units" value="${esc(d.unit)}" maxlength="20" placeholder="plate, kg, tray…">
+        <datalist id="e-units">${UNITS.map(u => `<option value="${u}">`).join('')}</datalist></div></div></div>
+    <div class="disc" data-on="${d.discount_type}"><div><label class="f" for="e-dt">Discount (optional)</label><select class="t" id="e-dt">
+        <option value="none" ${d.discount_type === 'none' ? 'selected' : ''}>None</option><option value="percent" ${d.discount_type === 'percent' ? 'selected' : ''}>Percentage</option><option value="fixed" ${d.discount_type === 'fixed' ? 'selected' : ''}>${esc(S.currency || 'KSh')} off</option></select></div>
+      ${d.discount_type !== 'none' ? `<div><label class="f" for="e-dv">${d.discount_type === 'percent' ? 'Percent off' : 'Amount off'}</label><div class="disc-v"><input class="t" id="e-dv" type="number" inputmode="numeric" min="0" ${d.discount_type === 'percent' ? 'max="100"' : ''} step="1" value="${esc(d.discount_value)}"><span>${d.discount_type === 'percent' ? '%' : esc(S.currency || 'KSh')}</span></div></div>` : ''}
+      <p class="muted hint" id="e-dh">${discHint(d)}</p></div>
+    ${d.prep === 'both' ? `<div class="grid2"><div><label class="f" for="e-cook">Extra charge when cooked (${esc(S.currency)})</label><input class="t" id="e-cook" type="number" min="0" value="${esc(d.cooked_extra || 0)}">
+      <p class="muted" style="margin:4px 0 0">Customers are asked “Cooked or raw?” automatically. Cooked costs ${money((Number(d.price) || 0) + (Number(d.cooked_extra) || 0))}.</p></div><div></div></div>` : ''}
+    <div class="grid2"><div><label class="f" for="e-serves">How many people does one feed? (optional)</label><input class="t" id="e-serves" type="number" min="0" value="${esc(d.serves || '')}" placeholder="e.g. 10 for an office platter"></div>
+      <div><label class="f" for="e-min">Smallest order</label><input class="t" id="e-min" type="number" min="1" max="50" value="${esc(d.min_qty || 1)}"></div></div>
+    <label class="f" for="e-desc">What's in it?</label><textarea class="t" id="e-desc" rows="2" maxlength="600" placeholder="What the customer gets, in a line or two">${esc(d.description)}</textarea>
+    <div class="grid2"><div id="e-imgs">${imgsHtml()}</div>
+      <div><label class="f" for="e-sort">Order on menu (lower shows first)</label><input class="t" id="e-sort" type="number" value="${esc(d.sort)}">
+      <label class="toggle"><input type="checkbox" id="e-av" ${d.available ? 'checked' : ''}> Show on menu</label></div></div>
+    <h4 style="margin:18px 0 0">Questions to ask the customer</h4>
+    <p class="muted" style="margin:4px 0 0">E.g. “Nduma or ngwaci?” (choose one), “How many guests?”, or “Extras” (choose any) with a price for each.${d.prep === 'both' ? ' “Cooked or raw?” is already asked for you.' : ''}</p>
+    <div id="e-opts">${d.options.map((g, gi) => `<div class="og">
+        <div class="grid2"><div><label class="f">Question</label><input class="t" data-gn="${gi}" value="${esc(g.name)}" maxlength="80"></div>
+        <div class="grid2"><div><label class="f">Type</label><select class="t" data-gt="${gi}"><option value="single" ${g.type === 'single' ? 'selected' : ''}>Choose one</option><option value="multi" ${g.type === 'multi' ? 'selected' : ''}>Choose any</option></select></div>
+        <div><label class="toggle" style="margin-top:34px"><input type="checkbox" data-gr="${gi}" ${g.required ? 'checked' : ''}> Required</label></div></div></div>
+        ${g.choices.map((c, ci) => `<div class="ch"><input class="t" aria-label="Choice" placeholder="Choice" data-cl="${gi}.${ci}" value="${esc(c.label)}" maxlength="80"><input class="t" aria-label="Extra price" type="number" min="0" placeholder="+ price" data-cp="${gi}.${ci}" value="${esc(c.price || '')}"><button class="x" aria-label="Remove choice" data-crm="${gi}.${ci}">×</button></div>`).join('')}
+        <div style="display:flex;gap:8px;margin-top:10px"><button class="btn btn-o" data-cadd="${gi}">+ Choice</button><button class="btn btn-d" data-grm="${gi}">Remove question</button></div></div>`).join('')}</div>
+    <button class="btn btn-o" id="e-addg" style="margin-top:10px">+ Add question</button>
+    <div class="err" id="e-err"></div>
+    <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap"><button class="btn btn-p" id="e-save">Save item</button><button class="btn btn-o" id="e-cancel">Cancel</button>
+      ${it ? '<button class="btn btn-d" id="e-del" style="margin-left:auto">Delete item</button>' : ''}</div>`;
+  };
+  function discHint(x) { if (x.discount_type === 'none') return 'Applies to the base price only. Extras and delivery stay full price.';
+    const p = Math.round(Number(x.price) || 0), s = salePrice(p, x.discount_type, Number(x.discount_value) || 0);
+    return `Customers pay ${money(s)} instead of ${money(p)}${s === 0 ? ' (free)' : ''}. Base price only; extras and delivery stay full price.`; }
+  const pull = () => {
+    d.name = $('#e-name').value; d.price = $('#e-price').value; d.category = $('#e-cat').value || 'Menu'; d.description = $('#e-desc').value;
+    d.prep = $('#e-prep').value; d.unit = $('#e-unit').value; d.serves = $('#e-serves').value; d.min_qty = $('#e-min').value; if ($('#e-cook')) d.cooked_extra = $('#e-cook').value;
+    d.sort = $('#e-sort').value; d.available = $('#e-av').checked;
+    d.discount_type = $('#e-dt').value; d.discount_value = d.discount_type === 'none' || !$('#e-dv') ? 0 : Number($('#e-dv').value);
+    ed.querySelectorAll('[data-gn]').forEach(x => d.options[x.dataset.gn].name = x.value);
+    ed.querySelectorAll('[data-gt]').forEach(x => d.options[x.dataset.gt].type = x.value);
+    ed.querySelectorAll('[data-gr]').forEach(x => d.options[x.dataset.gr].required = x.checked);
+    ed.querySelectorAll('[data-cl]').forEach(x => { const [g, c] = x.dataset.cl.split('.'); d.options[g].choices[c].label = x.value; });
+    ed.querySelectorAll('[data-cp]').forEach(x => { const [g, c] = x.dataset.cp.split('.'); d.options[g].choices[c].price = Number(x.value) || 0; });
+  };
+  draw(); drawImgs();
+  ed.onclick = async e => {
+    const t = e.target, ds = t.dataset;
+    if (t.closest('#e-library,#e-refresh-photos,[data-pick-photo],[data-delete-photo]')) {
+      if (imgBusy) return;
+      if (t.id === 'e-library') { libraryOpen = !libraryOpen; if (libraryOpen) await refreshPhotos(); else drawImgs(); return; }
+      if (t.id === 'e-refresh-photos') { await refreshPhotos(); return; }
+      const p = libraryPhotos[Number(ds.pickPhoto ?? ds.deletePhoto)]; if (!p) return;
+      if (ds.pickPhoto != null) {
+        if (!selectedPhoto(p) && d.images.length < MAX_IMGS) setImgs([...d.images, p.url]);
+        imgStatus = 'Photo selected. Save to apply.'; imgStatusErr = false; drawImgs(); return;
+      }
+      if (p.references.length || selectedPhoto(p)) return;
+      if (!confirm(`Permanently delete this unused photo file (${p.filename})? This cannot be undone.`)) return;
+      imgBusy = true; drawImgs();
+      try {
+        await api('/api/admin/photos/' + encodeURIComponent(p.filename), { method: 'DELETE', body: JSON.stringify({ confirm: true }) });
+        libraryPhotos = libraryPhotos.filter(photo => photo.filename !== p.filename);
+        imgStatus = 'Unused photo file deleted.'; imgStatusErr = false;
+      } catch (x) { imgStatus = x.message; imgStatusErr = true; }
+      finally { imgBusy = false; }
+      await refreshPhotos(); return;
+    }
+    if (imgBusy && t.closest('#e-save,#e-cancel,#e-del,[data-tpl],[data-icov],[data-irm]')) return;
+    if (t.id === 'e-cancel') { ed.hidden = true; return; }
+    if (ds.irm != null) { const a = d.images.slice(); a.splice(Number(ds.irm), 1); setImgs(a); imgStatus = 'Photo removed from this item only; file kept. Save to apply.'; imgStatusErr = false; drawImgs(); return; }
+    if (ds.icov != null) { const a = d.images.slice(), [u] = a.splice(Number(ds.icov), 1); a.unshift(u); setImgs(a); imgStatus = 'Cover changed. Save to apply.'; imgStatusErr = false; drawImgs(); return; }
+    const tp = t.closest('[data-tpl]'); if (tp) { pull(); const keep = d.images.slice(); Object.assign(d, JSON.parse(JSON.stringify(TEMPLATES[tp.dataset.tpl].d)), { discount_type: 'none', discount_value: 0 }); setImgs(keep); draw(); drawImgs(); $('#e-name').focus(); return; }
+    if (t.id === 'e-addg') { pull(); d.options.push({ name: '', type: 'single', required: false, choices: [{ label: '', price: 0 }] }); draw(); drawImgs(); return; }
+    if (ds.cadd) { pull(); d.options[ds.cadd].choices.push({ label: '', price: 0 }); draw(); drawImgs(); return; }
+    if (ds.grm) { pull(); d.options.splice(ds.grm, 1); draw(); drawImgs(); return; }
+    if (ds.crm) { pull(); const [g, c] = ds.crm.split('.'); d.options[g].choices.splice(c, 1); draw(); drawImgs(); return; }
+    if (t.id === 'e-del') { if (!confirm(`Delete “${d.name}”?`)) return; await api('/api/admin/items/' + it.id, { method: 'DELETE' }); ed.hidden = true; loadItems(); toast('Item deleted'); return; }
+    if (t.id === 'e-save') { if (imgBusy) return; pull(); setImgs(d.images);
+      const dv = d.discount_value;
+      if (d.discount_type !== 'none' && (!Number.isInteger(dv) || dv < 0 || (d.discount_type === 'percent' && dv > 100))) { $('#e-err').textContent = d.discount_type === 'percent' ? 'Discount must be a whole number from 0 to 100.' : 'Discount must be a whole number of ' + (S.currency || 'KSh') + ', 0 or more.'; $('#e-dv').focus(); return; }
+      if (d.discount_type === 'fixed' && dv > Number(d.price)) { $('#e-err').textContent = 'Discount cannot exceed the base price.'; $('#e-dv').focus(); return; }
+      try { await api(it ? '/api/admin/items/' + it.id : '/api/admin/items', { method: it ? 'PUT' : 'POST', body: JSON.stringify(d) }); ed.hidden = true; loadItems(); toast('Saved'); }
+      catch (x) { $('#e-err').textContent = x.message; } }
+  };
+  ed.oninput = e => { if (e.target.id === 'e-dv' || e.target.id === 'e-price') { pull(); $('#e-dh').textContent = discHint(d); } };
+  ed.onchange = async e => {
+    if (e.target.id === 'e-dt') { pull(); if (d.discount_type === 'none') d.discount_value = 0; draw(); drawImgs(); if ($('#e-dv')) $('#e-dv').focus(); return; }
+    if (e.target.id === 'e-prep' || ((e.target.id === 'e-price' || e.target.id === 'e-cook') && d.prep === 'both')) { pull(); draw(); drawImgs(); return; }
+    if (e.target.id !== 'e-img' || !e.target.files.length || imgBusy) return;
+    const files = [...e.target.files], room = MAX_IMGS - d.images.length, errs = [];
+    const ok = files.filter(f => { if (!IMG_TYPES.includes(f.type)) { errs.push(`${f.name}: not JPEG, PNG or WebP`); return false; } if (f.size > IMG_MAX) { errs.push(`${f.name}: larger than 6 MB`); return false; } return true; });
+    const queue = ok.slice(0, Math.max(0, room)); if (ok.length > queue.length) errs.push(`${ok.length - queue.length} skipped: max ${MAX_IMGS} photos`);
+    let done = 0; imgBusy = true; imgStatusErr = false;
+    try {
+      for (let k = 0; k < queue.length; k++) {
+        imgStatus = `Uploading ${k + 1} of ${queue.length}…`; drawImgs();
+        const fd = new FormData(); fd.append('image', queue[k]);
+        try { const r = await api('/api/admin/upload', { method: 'POST', body: fd }); if (!r.url) throw new Error('no URL returned'); setImgs([...d.images, r.url]); done++; }
+        catch (x) { errs.push(`${queue[k].name}: ${x.message}`); }
+      }
+    } finally { imgBusy = false; }
+    imgStatusErr = errs.length > 0;
+    imgStatus = (queue.length ? `${done} of ${queue.length} uploaded${done ? '. Save to apply.' : '.'}` : 'Nothing uploaded.') + (errs.length ? ' Problems: ' + errs.join('; ') : '');
+    drawImgs(); if (done && !errs.length) toast(done === 1 ? 'Photo uploaded' : `${done} photos uploaded`);
+    if (libraryOpen && done) await refreshPhotos();
+  };
+}
+
+// ---- customers ----
+let customers = [];
+async function loadCustomers() { try { customers = await api('/api/admin/customers'); } catch (x) { $('#customers').innerHTML = `<p class="err">${esc(x.message)}</p>`; return; } renderCustomers(); }
+function renderCustomers() {
+  const q = $('#custSearch').value.trim().toLowerCase(), qd = q.replace(/\D/g, '').replace(/^0/, '');
+  const list = customers.filter(c => !q || (c.name + ' ' + c.username).toLowerCase().includes(q) || (qd && c.phone.includes(qd)));
+  const when = t => t ? new Date(t.replace(' ', 'T') + 'Z').toLocaleDateString('en-KE', { dateStyle: 'medium' }) : '—';
+  $('#custCount').textContent = customers.length ? `(${customers.length})` : '';
+  $('#customers').innerHTML = list.length ? `<table class="cust"><thead><tr><th>Number</th><th>Name</th><th>Nickname</th><th>Orders</th><th>Spent</th><th>Last seen</th><th>Came from</th></tr></thead><tbody>${list.map(c => `<tr>
+      <td data-label="Number"><a href="https://wa.me/${esc(c.phone)}" target="_blank" rel="noopener"><b>+${esc(c.phone)}</b></a></td><td data-label="Name">${esc(c.name) || '<span class="muted">—</span>'}</td><td data-label="Nickname">${esc(c.username) || '<span class="muted">—</span>'}</td>
+      <td data-label="Orders"><a class="btn btn-o" style="min-height:44px" data-customer-orders href="#customer-orders=${encodeURIComponent(c.phone)}" aria-label="View orders for ${esc(c.name || c.phone)}">View orders (${c.orders})</a></td><td data-label="Spent">${c.orders ? money(c.spent) : '—'}</td><td data-label="Last seen">${when(c.last_seen_at)}</td><td data-label="Came from">${c.source === 'whatsapp' ? 'WhatsApp' : 'Website'}</td></tr>`).join('')}</tbody></table>`
+    : `<p class="muted">${customers.length ? 'No customer matches that search.' : 'No customers yet. Everyone who chats on WhatsApp or orders on the website is saved here.'}</p>`;
+}
+$('#custSearch').oninput = renderCustomers;
+$('#customers').addEventListener('click', e => {
+  const link = e.target.closest('[data-customer-orders]');
+  if (link && link.hash === location.hash && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
+    e.preventDefault(); oPage = 1; $('#statusFilter').value = ''; document.querySelector('.tabs [data-tab="orders"]').click(); loadOrders();
+  }
+});
+
+// ---- poster ---- (UI and downloads live in /admin-poster.js)
+function renderPoster() { return window.GrinPoster ? GrinPoster.render($('#tab-poster'), { api, esc, toast }) : null; }
+
+// ---- settings ----
+// One group visible at a time. Each form saves only its own keys, and nothing is re-rendered on save,
+// so unsaved edits in other groups stay exactly as typed.
+const SET_GROUPS = [['ordering', 'Ordering'], ['business', 'Business'], ['alerts', 'Kitchen alerts'], ['sms', 'SMS'], ['whatsapp', 'WhatsApp'], ['payments', 'Payments'], ['keys', 'API keys']];
+let setGroup = 'ordering', keysMounted = false;
+const localPhones = v => String(v || '').split(',').filter(Boolean).map(p => '0' + p.slice(3)).join(', ');
+function renderSettings() {
+  const times = (() => { try { return JSON.parse(S.delivery_times).join('\n'); } catch { return ''; } })();
+  const panel = (id, title, desc, body) => `<section class="set-panel" id="set-panel-${id}" role="tabpanel" aria-labelledby="set-tab-${id}" tabindex="0" ${id === setGroup ? '' : 'hidden'}>
+    <h3 class="set-h">${title}</h3>${desc ? `<p class="muted set-d">${desc}</p>` : ''}${body}</section>`;
+  const acts = (id, label, extra = '') => `<div class="err" id="${id}-err" role="alert"></div><div class="set-acts"><button class="btn btn-p" id="${id}-save">${label}</button>${extra}</div>`;
+  $('#tab-settings').innerHTML = `<div class="set-heading"><h2>Settings</h2><select class="t set-select" id="set-group-select" aria-label="Settings group">${SET_GROUPS.map(([id, label]) => `<option value="${id}" ${id === setGroup ? 'selected' : ''}>${label}</option>`).join('')}</select></div>
+  <div class="set-tabs" role="tablist" aria-label="Settings groups">${SET_GROUPS.map(([id, l]) =>
+    `<button type="button" role="tab" id="set-tab-${id}" data-stab="${id}" aria-controls="set-panel-${id}" aria-selected="${id === setGroup}" tabindex="${id === setGroup ? 0 : -1}">${l}</button>`).join('')}</div>
+  <div class="card set-card">
+  ${panel('ordering', 'Ordering', '', `<form id="set-ordering" data-group="ordering">
+    <label class="toggle"><input type="checkbox" id="s-acc" ${S.accepting_orders === '1' ? 'checked' : ''}> Taking orders now</label>
+    <details class="set-closed" ${S.accepting_orders === '1' ? '' : 'open'}><summary>Closed message</summary><label class="f" for="s-closed">Message when not taking orders</label><input class="t" id="s-closed" value="${esc(S.closed_message)}"></details>
+    <label class="f" for="s-fee">Delivery fee (${esc(S.currency)})</label><input class="t" id="s-fee" type="number" min="0" value="${esc(S.delivery_fee)}">
+    <label class="f" for="s-times">Delivery slots (one per line)</label><textarea class="t" id="s-times" rows="2">${esc(times)}</textarea>
+    ${acts('s-ordering', 'Save ordering')}</form>`)}
+  ${panel('business', 'Business', 'Your name on the order page and how customers can chat.', `<form id="set-business" data-group="business">
+    <div class="grid2"><div><label class="f" for="s-name">Business name</label><input class="t" id="s-name" value="${esc(S.business_name)}"></div>
+      <div><label class="f" for="s-tag">Tagline</label><input class="t" id="s-tag" value="${esc(S.tagline)}"></div></div>
+    <label class="f" for="s-pay">Payment note shown to customers</label><input class="t" id="s-pay" value="${esc(S.payment_note)}">
+    <h4 class="set-sub">Customer chat</h4>
+    <label class="toggle"><input type="checkbox" id="s-webchat" ${S.website_chat_enabled === '1' ? 'checked' : ''}> Website chat</label>
+    <label class="toggle"><input type="checkbox" id="s-wachat" ${S.whatsapp_chat_enabled === '1' ? 'checked' : ''}> WhatsApp</label>
+    <p class="muted" style="margin:4px 0 0">One enabled opens directly. Both enabled offers a choice. Both off hides chat. WhatsApp needs a connected number.</p>
+    ${acts('s-business', 'Save business')}</form>`)}
+  ${panel('alerts', 'Kitchen alerts', 'Who gets a WhatsApp message when a new order comes in.', `<form id="set-alerts" data-group="alerts">
+    <label class="f" for="s-phone">Kitchen phones for new-order alerts</label><input class="t" id="s-phone" value="${esc(localPhones(S.notify_phone))}" inputmode="tel" placeholder="0712 345 678, 0722 000 111">
+    <p class="muted" style="margin:4px 0 0">Use commas for more than one. Customers are told to call the first.</p>
+    ${acts('s-alerts', 'Save alerts', '<button type="button" class="btn btn-o" id="s-test">Send test alert</button>')}
+    <p class="muted set-note">The test uses the saved phones. Save first if you changed them.</p></form>`)}
+  ${panel('sms', 'SMS alerts (Blessed Texts)', 'An SMS goes to the number below the moment a customer confirms an order, on WhatsApp or the website.', `<form id="smsForm" data-group="sms">
+    <label class="toggle"><input type="checkbox" id="sms-on" ${S.sms_enabled === '1' ? 'checked' : ''}> Send an SMS for every confirmed order</label>
+    <div class="grid2"><div><label class="f" for="sms-key">API key</label><input class="t" id="sms-key" type="password" autocomplete="off"></div>
+      <div><label class="f" for="sms-sender">Sender ID</label><input class="t" id="sms-sender" value="${esc(S.sms_sender_id)}" maxlength="20" placeholder="e.g. 23107"></div></div>
+    <label class="f" for="sms-phone">Send the SMS to</label><input class="t" id="sms-phone" value="${esc(localPhones(S.sms_phone))}" inputmode="tel" placeholder="Leave empty to use the kitchen phone. Use commas for more than one number.">
+    ${acts('sms', 'Save SMS settings', '<button type="button" class="btn btn-o" id="sms-test">Send test SMS</button>')}</form>`)}
+  ${panel('whatsapp', 'WhatsApp', '', `<form id="set-whatsapp" data-group="whatsapp">
+    <label class="toggle"><input type="checkbox" id="s-cust" ${S.notify_customer === '1' ? 'checked' : ''}> Send website customers a WhatsApp confirmation</label>
+    ${acts('s-whatsapp', 'Save confirmation setting')}</form>
+    <div id="wa-card" class="set-split"><h4 class="set-sub" style="margin-top:0">WhatsApp ordering number</h4><div id="wa-box"><p class="muted">Checking…</p></div></div>`)}
+  ${panel('payments', 'Payments', 'Customers can pay by M-Pesa (SunPay) from their private tracking link.', '<div id="pay-box"><p class="muted">Checking…</p></div>')}
+  ${panel('keys', 'API keys', '', '<div id="provider-keys" class="set-keys"></div>')}
+  </div>`;
+  smsKeyPlaceholder();
+  const tabs = [...document.querySelectorAll('#tab-settings [data-stab]')];
+  const tablist = $('#tab-settings .set-tabs');
+  tablist.onclick = e => { const b = e.target.closest('[data-stab]'); if (b) { e.stopPropagation(); showSetGroup(b.dataset.stab); } };
+  tablist.onkeydown = e => {
+    const i = tabs.indexOf(document.activeElement); if (i < 0) return;
+    const n = { ArrowRight: i + 1, ArrowDown: i + 1, ArrowLeft: i - 1, ArrowUp: i - 1, Home: 0, End: tabs.length - 1 }[e.key];
+    if (n == null) return; e.preventDefault();
+    const t = tabs[(n + tabs.length) % tabs.length]; showSetGroup(t.dataset.stab); t.focus();
+  };
+  const GROUP_PAYLOAD = {
+    ordering: () => ({ accepting_orders: $('#s-acc').checked, closed_message: $('#s-closed').value, delivery_fee: $('#s-fee').value, delivery_times: $('#s-times').value }),
+    business: () => ({ business_name: $('#s-name').value, tagline: $('#s-tag').value, payment_note: $('#s-pay').value, website_chat_enabled: $('#s-webchat').checked, whatsapp_chat_enabled: $('#s-wachat').checked }),
+    alerts: () => ({ notify_phone: $('#s-phone').value }),
+    whatsapp: () => ({ notify_customer: $('#s-cust').checked }),
+  };
+  $('#set-group-select').onchange = e => showSetGroup(e.target.value);
+  $('#s-acc').onchange = e => { if (!e.target.checked) $('#set-ordering .set-closed').open = true; };
+  for (const g of Object.keys(GROUP_PAYLOAD)) $('#set-' + g).onsubmit = async e => {
+    e.preventDefault(); const err = $(`#s-${g}-err`), btn = $(`#s-${g}-save`); err.textContent = ''; btn.disabled = true;
+    try { S = { ...S, ...(await api('/api/admin/settings', { method: 'PUT', body: JSON.stringify(GROUP_PAYLOAD[g]()) })) };
+      if (g === 'alerts') $('#s-phone').value = localPhones(S.notify_phone);
+      toast(`${SET_GROUPS.find(x => x[0] === g)[1]} saved`); }
+    catch (x) { err.textContent = x.message; } finally { btn.disabled = false; }
+  };
+  $('#smsForm').onsubmit = async e => { e.preventDefault(); const err = $('#sms-err'), btn = $('#sms-save'); err.textContent = ''; btn.disabled = true;
+    try { S = { ...S, ...(await api('/api/admin/settings', { method: 'PUT', body: JSON.stringify({ sms_api_key: $('#sms-key').value, sms_sender_id: $('#sms-sender').value, sms_phone: $('#sms-phone').value, sms_enabled: $('#sms-on').checked }) })) };
+      $('#sms-key').value = ''; $('#sms-phone').value = localPhones(S.sms_phone); smsKeyPlaceholder(); toast('SMS settings saved'); }
+    catch (x) { err.textContent = x.message;
+      try { S = { ...S, ...(await api('/api/admin/settings')) }; $('#sms-on').checked = S.sms_enabled === '1'; if (S.sms_api_key_set) $('#sms-key').value = ''; smsKeyPlaceholder(); } catch {} }
+    finally { btn.disabled = false; } };
+  $('#sms-test').onclick = async () => { try { const r = await api('/api/admin/test-sms', { method: 'POST' }); toast(r.ok ? 'Test SMS sent' : r.error); } catch (x) { toast(x.message); } };
+  $('#s-test').onclick = async () => { try { const r = await api('/api/admin/test-notify', { method: 'POST' }); toast(r.ok ? (r.error ? 'Sent, but not to every phone: ' + r.error : 'Test alert sent') : r.error); } catch (x) { toast(x.message); } };
+  showSetGroup(setGroup);
+}
+function smsKeyPlaceholder() { const k = $('#sms-key'); if (k) k.placeholder = S.sms_api_key_set ? 'Saved (' + (S.sms_api_key_hint || '') + ') — type to replace' : 'Paste your Blessed Texts API key'; }
+function showSetGroup(id) {
+  setGroup = id;
+  if ($('#set-group-select')) $('#set-group-select').value = id;
+  document.querySelectorAll('#tab-settings [data-stab]').forEach(b => { const on = b.dataset.stab === id; b.setAttribute('aria-selected', on); b.tabIndex = on ? 0 : -1; });
+  document.querySelectorAll('#tab-settings .set-panel').forEach(p => p.hidden = p.id !== 'set-panel-' + id);
+  if (id === 'whatsapp') {
+    // Keep an unfinished connection form intact while visiting other settings.
+    // Connected/pending views still refresh, and explicit actions reload themselves.
+    if (!$('#wa-form')) loadWhatsApp();
+  } else clearTimeout(waPoll);
+  if (id === 'payments') loadSunPay();
+  if (id === 'keys' && !keysMounted) { keysMounted = true; window.mountProviderKeys($('#provider-keys')); }
+}
+
+// ---- Payments (SunPay M-Pesa) ----
+async function loadSunPay() {
+  const box = $('#pay-box'); if (!box) return;
+  let P; try { P = await api('/api/admin/sunpay'); } catch (x) { box.innerHTML = `<p class="err">${esc(x.message)}</p><button class="btn btn-o" id="pay-retry">Try again</button>`; $('#pay-retry').onclick = loadSunPay; return; }
+  box.innerHTML = `<div class="pay-warn">SunPay payments are REAL money, even while orders and WhatsApp run in Demo mode.</div>
+    <p class="muted set-note">Status: ${P.configured ? 'SunPay key saved.' : 'No SunPay key yet. Add it in Settings, API keys.'} ${P.enabled ? 'Payments are on.' : 'Payments are off.'}</p>
+    ${P.callback_url ? `<p class="set-note muted">Callback URL: <code>${esc(P.callback_url)}</code></p>` : ''}
+    <form id="pay-form"><label class="toggle"><input type="checkbox" id="pay-on" ${P.enabled ? 'checked' : ''} ${!P.configured && !P.enabled ? 'disabled' : ''}> Let customers pay with M-Pesa</label>
+    <p class="set-note muted">Customers only get a prompt when they tap Pay with M-Pesa themselves. Nothing is tested or sent from here.</p>
+    <div class="set-acts"><button class="btn btn-p" id="pay-save">Save payment setting</button>${P.configured ? '' : '<button type="button" class="btn btn-o" id="pay-keys">Go to API keys</button>'}</div><div class="err" id="pay-err"></div></form>`;
+  if ($('#pay-keys')) $('#pay-keys').onclick = () => showSetGroup('keys');
+  $('#pay-form').onsubmit = async e => { e.preventDefault(); const btn = $('#pay-save'), err = $('#pay-err'); err.textContent = ''; btn.disabled = true;
+    try { await api('/api/admin/sunpay', { method: 'PUT', body: JSON.stringify({ enabled: $('#pay-on').checked }) }); toast('Payment setting saved'); loadSunPay(); }
+    catch (x) { err.textContent = x.message; btn.disabled = false; } };
+}
+const PAY_BADGE = s => s === 'completed' ? ['paid', 'Paid'] : ['initiating', 'pending', 'unknown'].includes(s) ? ['pend', 'Pending'] : ['', 'Unpaid'];
+
+// ---- WhatsApp number (LeadsIntel) ----
+let waPoll = null, waTab = 'existing', waTyped = {};
+const STEP_TEXT = {
+  pending: ['⏳', 'Setup requested. LeadsIntel is preparing the number.'],
+  awaiting_code: ['🔢', 'Waiting for the verification code. LeadsIntel will ask for the code WhatsApp sends to this number. Give it to LeadsIntel.'],
+  connected: ['✅', 'Connected.'],
+  failed: ['⚠️', 'Setup failed. Contact LeadsIntel to retry this request (do not submit the number again).'],
+  cancelled: ['✖️', 'Setup cancelled. Contact LeadsIntel to restart setup for this number.'],
+};
+async function loadWhatsApp() {
+  clearTimeout(waPoll);
+  const box = $('#wa-box'); if (!box) return;
+  let W; try { W = await api('/api/admin/whatsapp'); } catch (x) { box.innerHTML = `<p class="err">${esc(x.message)}</p>`; return; }
+  if (!W.key_configured) { box.innerHTML = `<p>Add your LeadsIntel API key under Settings → API keys, then reopen this tab.</p>`; return; }
+  const demoNote = W.demo ? `<div class="warn">🧪 <b>Demo mode.</b> This uses a pretend LeadsIntel; nothing real is sent. Try <b>0711 000 111</b> as a number already on LeadsIntel. Chat as a customer in the <a href="/simulator" target="_blank">WhatsApp simulator</a>.</div>` : '';
+  const httpsNote = demoNote + (W.https ? '' : `<div class="warn">Open Admin using your hosted HTTPS website address so LeadsIntel can deliver chats here. The webhook address is detected automatically.</div>`);
+
+  // A number is linked and usable
+  if (W.ready) {
+    const c = W.connection;
+    box.innerHTML = `<div class="wa-num">${esc(W.display_phone || '—')}</div>
+      <p class="muted" style="margin:2px 0 10px">${W.mode === 'new' ? 'Connected through LeadsIntel setup' : 'Existing LeadsIntel number'}${c ? ` · status: <b>${esc(c.status || '—')}</b>` : ''}</p>
+      ${W.connection_error ? `<p class="err">${esc(W.connection_error)}</p>` : ''}
+      ${c && !W.active ? `<div class="warn">⚠️ LeadsIntel reports this number as <b>${esc(c.status || 'not active')}</b>. Messages can’t be sent or received until it is active — contact LeadsIntel.</div>` : ''}
+      ${c ? (W.pointed ? `<p>✅ Customer chats on this number come to this site.</p>`
+        : `<div class="warn">Chats on this number are going to <code>${esc(c.webhook || 'nowhere')}</code>, not here. <button type="button" class="btn btn-o" id="wa-repoint" style="margin-top:8px">Send chats here</button></div>`) : ''}
+      ${W.same_as_kitchen ? `<div class="warn">⚠️ This is also the kitchen alert phone. WhatsApp can’t send a message to the number it comes from, so set a <b>different</b> “Kitchen phone for new-order alerts” above.</div>` : ''}
+      ${httpsNote}
+      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button type="button" class="btn btn-o" id="wa-refresh">Refresh</button>
+        <button type="button" class="btn btn-d" id="wa-unlink">Change number</button></div>`;
+    $('#wa-refresh').onclick = loadWhatsApp;
+    if ($('#wa-repoint')) $('#wa-repoint').onclick = () => waAction('/api/admin/whatsapp/repoint', {}, 'Chats now come here');
+    $('#wa-unlink').onclick = () => { if (confirm('Stop using this number for GrinFud orders? Nothing is deleted on LeadsIntel, but customers chatting this number will no longer get the order menu until you link a number again.')) waAction('/api/admin/whatsapp/unlink', {}, 'Number unlinked'); };
+    return;
+  }
+
+  // A new-number setup is in progress or ended
+  if (W.mode === 'new' && W.request) {
+    const st = W.request.status || 'pending'; const [ic, tx] = STEP_TEXT[st] || ['⏳', st];
+    const order = ['pending', 'awaiting_code', 'connected']; const at = order.indexOf(st);
+    box.innerHTML = `<div class="wa-num">${esc(W.display_phone)}</div>
+      <ol class="wa-steps">${['Requested', 'Verification code', 'Connected'].map((s, i) => `<li class="${at > i || st === 'connected' ? 'done' : at === i ? 'now' : ''}">${s}</li>`).join('')}</ol>
+      <p>${ic} ${tx}${W.demo && st === 'awaiting_code' ? ' <a href="/simulator" target="_blank">Open the simulator to enter the code →</a>' : ''}</p>${W.request.error ? `<p class="err">${esc(W.request.error)}</p>` : ''}${httpsNote}
+      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button type="button" class="btn btn-o" id="wa-refresh">Refresh</button>
+        ${st === 'pending' ? '<button type="button" class="btn btn-d" id="wa-cancel">Cancel setup</button>' : ''}
+        ${['failed', 'cancelled'].includes(st) ? '<button type="button" class="btn btn-o" id="wa-unlink">Use a different number</button>' : ''}</div>`;
+    $('#wa-refresh').onclick = loadWhatsApp;
+    if ($('#wa-cancel')) $('#wa-cancel').onclick = () => { if (confirm('Cancel this setup? LeadsIntel will not accept a new request for the same number afterwards; you would have to contact them to restart.')) waAction('/api/admin/whatsapp/cancel', {}, 'Setup cancelled'); };
+    if ($('#wa-unlink')) $('#wa-unlink').onclick = () => waAction('/api/admin/whatsapp/unlink', {}, 'Cleared');
+    if (['pending', 'awaiting_code'].includes(st) || (st === 'connected' && !W.ready)) waPoll = setTimeout(() => { if (!$('#tab-settings').hidden && setGroup === 'whatsapp') loadWhatsApp(); }, 6000);
+    return;
+  }
+
+  // Nothing linked: choose how
+  const ph = esc(waTyped.phone || ''), cc = esc(waTyped.cc || '254');
+  box.innerHTML = `<p class="muted" style="margin-top:0">Pick the WhatsApp number customers will message to order.</p>${httpsNote}
+    <div class="seg" role="tablist"><button type="button" data-wt="existing" aria-selected="${waTab === 'existing'}">Number already on LeadsIntel</button>
+      <button type="button" data-wt="new" aria-selected="${waTab === 'new'}">Connect a new number</button></div>
+    <form id="wa-form" autocomplete="off">
+      <div class="phone-row"><div><label class="f" for="wa-cc">Code</label><input class="t" id="wa-cc" value="${cc}" inputmode="numeric"></div>
+        <div><label class="f" for="wa-ph">Phone number</label><input class="t" id="wa-ph" value="${ph}" inputmode="tel" placeholder="07xx xxx xxx" required></div></div>
+      ${waTab === 'existing' ? `<div id="wa-found"></div>
+        <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap"><button class="btn btn-p" id="wa-go">Find number</button></div>`
+      : `<div class="grid2"><div><label class="f" for="wa-bn">Business name</label><input class="t" id="wa-bn" value="${esc(S.business_name || 'GrinFud')}" required></div>
+          <div><label class="f" for="wa-dn">WhatsApp display name</label><input class="t" id="wa-dn" value="${esc(S.business_name || 'GrinFud')}" required></div></div>
+        <p class="muted" style="font-size:13px;margin:6px 0 0">Meta checks the display name, and it can’t be changed here later.</p>
+        <label class="f" for="wa-ab">About (max 139)</label><input class="t" id="wa-ab" maxlength="139" value="${esc(S.tagline || '')}">
+        <label class="f" for="wa-ds">Description (optional)</label><textarea class="t" id="wa-ds" rows="2" maxlength="512"></textarea>
+        <div class="grid2"><div><label class="f" for="wa-ad">Address (optional)</label><input class="t" id="wa-ad" maxlength="256" value="Nairobi"></div>
+          <div><label class="f" for="wa-em">Email (optional)</label><input class="t" id="wa-em" type="email"></div></div>
+        <label class="f" for="wa-wb">Website (optional)</label><input class="t" id="wa-wb" value="${esc(W.https ? new URL(W.webhook_url).origin : '')}" placeholder="https://">
+        <div class="warn">The number must be able to receive the WhatsApp verification code. LeadsIntel will ask for that code during setup.</div>
+        <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap"><button class="btn btn-p" id="wa-go" ${W.https ? '' : 'disabled'}>Request connection</button></div>`}
+      <div class="err" id="wa-err"></div></form>`;
+  document.querySelectorAll('[data-wt]').forEach(b => b.onclick = () => { waTab = b.dataset.wt; loadWhatsApp(); });
+  const num = () => ({ country_code: $('#wa-cc').value, phone: $('#wa-ph').value });
+  let found = null;
+  $('#wa-cc').oninput = () => { waTyped.cc = $('#wa-cc').value; };
+  $('#wa-ph').oninput = () => { waTyped.phone = $('#wa-ph').value; found = null; if ($('#wa-found')) { $('#wa-found').innerHTML = ''; $('#wa-go').textContent = 'Find number'; } };
+  $('#wa-form').onsubmit = async e => {
+    e.preventDefault(); $('#wa-err').textContent = ''; const go = $('#wa-go'); go.disabled = true;
+    try {
+      if (waTab === 'existing' && !found) {
+        found = await api('/api/admin/whatsapp/lookup', { method: 'POST', body: JSON.stringify(num()) });
+        $('#wa-found').innerHTML = `<div class="found"><b>${esc(found.display_phone)}</b> · ${esc(found.status || 'found')}
+          <p style="margin:6px 0 0">All WhatsApp chats to this number will be answered by the GrinFud ordering chat. If this number is used by another bot today, that bot will stop receiving them.</p></div>`;
+        go.textContent = 'Use this number'; go.disabled = !W.https;
+        return;
+      }
+      if (waTab === 'existing') await api('/api/admin/whatsapp/use-existing', { method: 'POST', body: JSON.stringify(num()) });
+      else await api('/api/admin/whatsapp/connect-new', { method: 'POST', body: JSON.stringify({ ...num(), business_name: $('#wa-bn').value, display_name: $('#wa-dn').value,
+        about: $('#wa-ab').value, description: $('#wa-ds').value, address: $('#wa-ad').value, email: $('#wa-em').value, website: $('#wa-wb').value }) });
+      toast(waTab === 'existing' ? 'Number linked' : 'Setup requested'); loadWhatsApp(); S = await api('/api/admin/settings');
+    } catch (x) { $('#wa-err').textContent = x.message; go.disabled = false; }
+  };
+}
+async function waAction(url, body, msg) {
+  try { await api(url, { method: 'POST', body: JSON.stringify(body) }); toast(msg); } catch (x) { toast(x.message); }
+  loadWhatsApp(); try { S = await api('/api/admin/settings'); } catch {}
+}
+
+api('/api/admin/me').then(start).catch(showLogin);
+</script>
+</body>
+</html>
