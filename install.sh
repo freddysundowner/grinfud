@@ -2,7 +2,7 @@
 # Ubuntu installer. Run on YOUR VPS, not in the Replit workspace.
 set -Eeuo pipefail
 umask 027
-DOMAIN=grinfud.tushop.live
+DOMAIN=grinfud.reggycodas.com
 DB=grinfud
 ROLE=grinfud
 PGPORT=5432
@@ -16,7 +16,7 @@ BASE=/opt/grinfud
 DATA=/var/lib/grinfud
 ENV_FILE=/etc/grinfud/grinfud.env
 BACKUPS=/var/backups/grinfud
-SITE=/etc/nginx/sites-available/grinfud.tushop.live
+SITE="/etc/nginx/sites-available/$DOMAIN"
 MARKER='# Managed by the GrinFud Ubuntu installer'
 usage() {
   cat <<'HELP'
@@ -25,7 +25,7 @@ sudo bash install.sh --email you@example.com [--server-ip PUBLIC_IPV4]
   --pg-port 5432         Existing local PostgreSQL cluster port
   --check               Read-only OS/PostgreSQL/Nginx/DNS diagnostics
 
-Targets Ubuntu 20.04/22.04/24.04, grinfud.tushop.live, database/role grinfud.
+Targets Ubuntu 20.04/22.04/24.04, grinfud.reggycodas.com, database/role grinfud.
 PostgreSQL is NEVER installed, replaced, dropped or reset.
 Existing databases must be owned by grinfud and allow local peer authentication.
 Existing unrelated Nginx sites and credentials are never overwritten.
@@ -65,7 +65,7 @@ echo "PostgreSQL: available on local port $PGPORT."
 sql -d postgres -Atqc "SELECT datname || ' (owner: ' || pg_get_userbyid(datdba) || ')' FROM pg_database WHERE datname='grinfud'"
 if command -v nginx >/dev/null; then nginx -t; fi
 if command -v dig >/dev/null; then
-  echo "Authoritative nameservers for tushop.live:"; dig +short NS tushop.live
+  echo "Authoritative nameservers for reggycodas.com:"; dig +short NS reggycodas.com
   echo "Subdomain A / AAAA / CNAME records:"
   for type in A AAAA CNAME; do dig +short "$DOMAIN" "$type"; done
 else echo 'DNS diagnostics need dnsutils; normal installation installs it.'; fi
@@ -84,11 +84,11 @@ nginx -t
 # Reject a domain already handled by another enabled virtual host.
 while IFS= read -r entry; do
   [[ "$(realpath "$entry")" == "$SITE" ]] && continue
-  if grep -Eq "server_name[^;]*grinfud[.]tushop[.]live([[:space:];]|$)" "$entry"; then
+  if grep -Eq "server_name[^;]*grinfud[.]reggycodas[.]com([[:space:];]|$)" "$entry"; then
     die "Another enabled Nginx configuration handles $DOMAIN: $entry"
   fi
 done < <(find -L /etc/nginx/sites-enabled /etc/nginx/conf.d -maxdepth 1 -type f 2>/dev/null)
-echo 'DNS nameservers:'; dig +short NS tushop.live
+echo 'DNS nameservers:'; dig +short NS reggycodas.com
 [[ -n "$SERVER_IP" ]] || SERVER_IP="$(curl -4fsS --max-time 15 https://api.ipify.org)"
 python3 - "$SERVER_IP" <<'PY'
 import ipaddress, sys
@@ -314,7 +314,7 @@ EOF
 if [[ -f "/etc/letsencrypt/live/$DOMAIN/fullchain.pem" && -f "/etc/letsencrypt/live/$DOMAIN/privkey.pem" ]]; then
   write_site yes
 else write_site no; fi
-ln -sfn "$SITE" /etc/nginx/sites-enabled/grinfud.tushop.live
+ln -sfn "$SITE" "/etc/nginx/sites-enabled/$DOMAIN"
 nginx -t
 systemctl enable --now nginx
 systemctl reload nginx
