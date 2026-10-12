@@ -1,7 +1,7 @@
 # GrinFud on Ubuntu
 
 This bundle contains the current application and `install.sh`. It targets
-**Ubuntu 20.04, 22.04 or 24.04**, `grinfud.reggycodas.com`, and the local PostgreSQL
+**Ubuntu 20.04, 22.04 or 24.04**, `grinfud.luxestores.shop`, and the local PostgreSQL
 database **grinfud**. Run it on your VPS, not inside Replit.
 
 Ubuntu 20.04 is past standard security maintenance. Keep security updates active
@@ -107,7 +107,7 @@ Installer backups are point-in-time copies, **not** an ongoing backup schedule.
 
 ## After installation
 
-Open `https://grinfud.reggycodas.com/admin` with the password you entered.
+Open `https://grinfud.luxestores.shop/admin` with the password you entered.
 Review delivery settings, kitchen notification number, chat channels and provider
 keys before accepting orders. Fresh databases start without a kitchen contact.
 Existing settings are retained. SunPay is real-money functionality and must only
