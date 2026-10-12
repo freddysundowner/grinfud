@@ -59,6 +59,9 @@ async function send(to, message, idemKey) {
 const getConnection = (tenant, conn) => call('GET', connPath(tenant, conn));
 const patchConnection = (tenant, conn, body) => call('PATCH', connPath(tenant, conn), body); // 204 on success
 const lookup = phoneE164 => call('POST', '/external-platform/whatsapp/connections/lookup', { phoneNumber: phoneE164 });
+const lookupClaim = phoneNumber => call('POST', '/external-platform/whatsapp/existing-numbers/lookup', { phoneNumber });
+const createClaim = body => call('POST', '/external-platform/whatsapp/existing-numbers/claims', body);
+const verifyClaim = (id, code) => call('POST', `/external-platform/whatsapp/existing-numbers/claims/${enc(id)}/verify`, { code });
 
 // ---- assisted setup (connect a new number) ----
 const createAssisted = body => call('POST', '/external-platform/whatsapp/assisted-requests', body);
@@ -76,5 +79,5 @@ function verify(rawBody, headers) {
   return a.length === b.length && crypto.timingSafeEqual(a, b) ? { ok: true } : { ok: false, reason: 'bad signature' };
 }
 
-module.exports = { init, cfg, send, verify, errText, newSecret, getConnection, patchConnection, lookup,
+module.exports = { init, cfg, send, verify, errText, newSecret, getConnection, patchConnection, lookup, lookupClaim, createClaim, verifyClaim,
   createAssisted, getAssisted, cancelAssisted, keyConfigured, sendConfigured, inboundConfigured };

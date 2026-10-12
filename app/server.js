@@ -91,6 +91,7 @@ INSERT INTO customers (phone, name, source, created_at, last_seen_at)
   SELECT DISTINCT ON (phone) phone, customer_name, source, created_at, created_at FROM orders WHERE phone <> '' ORDER BY phone, id DESC
   ON CONFLICT (phone) DO NOTHING;
 CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT);
+CREATE TABLE IF NOT EXISTS wa_claim (id INTEGER PRIMARY KEY CHECK (id=1), state_json TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS webhook_events (id TEXT PRIMARY KEY, at BIGINT);
 CREATE TABLE IF NOT EXISTS chats (phone TEXT PRIMARY KEY, state_json TEXT, updated_at BIGINT);
 CREATE TABLE IF NOT EXISTS wa_link (id INTEGER PRIMARY KEY CHECK (id = 1), mode TEXT, tenant_id TEXT, connection_id TEXT,
@@ -663,6 +664,7 @@ const webhookUrl = () => publicUrls.origin() ? publicUrls.absolute('/webhooks/le
 const needKey = () => { if (!li.keyConfigured()) throw new Error('Add the LeadsIntel API key in Admin Settings first.'); };
 const needHttps = () => { if (!/^https:\/\//.test(webhookUrl())) throw new Error('Open Admin using the hosted HTTPS website address so LeadsIntel can reach the webhook.'); };
 const ACTIVE = ['connected', 'active'];
+const waClaims = require('./whatsapp-claim')(app, { db, li, requireAdmin, wrap, waGet, waSet, webhookUrl, parseNumber, needKey, needHttps, demo: DEMO });
 function parseNumber(b) {
   const cc = String(b.country_code || '254').replace(/\D/g, '') || '254';
   let d = String(b.phone || '').replace(/\D/g, '');
@@ -671,7 +673,7 @@ function parseNumber(b) {
   if (d.length < 6 || cc.length + d.length > 15) throw new Error('Enter a valid phone number.');
   return { cc, national: d, e164: `+${cc}${d}` };
 }
-const LOOKUP_ERRORS = { 404: 'That number is not connected on LeadsIntel yet. Use “Connect a new number” instead.',
+const LOOKUP_ERRORS = { 404: 'This number is not linked to your platform key. If it is already on Lead Intel, choose “Connect a Lead Intel number using SMS”.',
   409: 'LeadsIntel has more than one connection for that number. Ask LeadsIntel which one to use.', 400: 'LeadsIntel says that phone number is not valid.' };
 
 async function refreshWa() {
@@ -694,7 +696,7 @@ app.get('/api/admin/whatsapp', requireAdmin, wrap(async (req, res) => {
   const L = await refreshWa();
   const out = { demo: DEMO, key_configured: li.keyConfigured(), webhook_url: webhookUrl(), https: /^https:\/\//.test(webhookUrl()),
     mode: L.mode || '', display_phone: L.display_phone || '', ready: li.sendConfigured(),
-    request: L.mode === 'new' ? { status: L.request_status, error: L.request_error || '' } : null, connection: null };
+    request: L.mode === 'new' ? { status: L.request_status, error: L.request_error || '' } : null, connection: null, claim: await waClaims.status() };
   // WhatsApp cannot deliver a message a number sends to itself, so the kitchen phone must be a different phone.
   out.same_as_kitchen = !!L.display_phone && kitchenPhones(getSettings()).includes(String(L.display_phone).replace(/\D/g, ''));
   if (li.sendConfigured()) {
