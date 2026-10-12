@@ -9,7 +9,24 @@ through Ubuntu Pro/ESM or plan an upgrade to a newer LTS. The installer does not
 upgrade the OS or PostgreSQL. It uses the same private Node 22 runtime and
 systemd/Nginx configuration on all three versions.
 
-## Before running
+## Optional sample menu with photos
+
+After installation, run `sudo bash seed-menu.sh` from this checkout and type
+`SEED` to confirm. If upgrading an older installation, first pull the latest
+code and rerun `install.sh` to install the new seed command.
+
+This adds three **visible** sample menu items: breakfast basket, fruit bowl and
+family vegetable basket. Each has a bundled photo saved in persistent uploads;
+no external image host is needed when seeding or serving these photos. Sample
+photos are illustrative. Edit prices, descriptions and photos in Admin before
+accepting real orders, or turn off ordering while setting up.
+
+Rerunning the command skips previously seeded entries, preserving admin edits
+and deletions. Existing menu items, customers and orders are not modified. No
+fake customers or orders are created, and no messages or payments are sent.
+For another PostgreSQL port, run `sudo bash seed-menu.sh 5433`.
+
+## Installation prerequisites
 
 1. Back up your server. The installer also makes a database dump, uploads archive
    and credentials copy before application migrations, in `/var/backups/grinfud`.
