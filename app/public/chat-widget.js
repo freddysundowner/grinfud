@@ -36,20 +36,15 @@
     voiceReset();
     opening = true;
     if (trigger) returnFocus = trigger;
-    const act = m => {
-      if (!m.website_chat_enabled && !m.whatsapp_chat_enabled) return;
-      if (m.website_chat_enabled && !m.whatsapp_chat_enabled) { if (view !== 'chat') openChat(); }
-      else if (!m.website_chat_enabled && m.whatsapp_chat_enabled && waUrl(m)) { close(); window.location.assign(waUrl(m)); }
-      else if (view !== 'choose') openChooser(m);
-    };
-    if (channels && channels.website_chat_enabled) { act(channels); opening = false; fetchChannels().catch(() => {}); return; }
+    // Always resolve current admin settings before choosing a channel. The old
+    // cached fast path could leave a two-channel chooser open after one was disabled.
     view = 'loading'; bg.classList.add('open'); lock(true); vv();
     const sk = el('div', 'gfc-choose gfc-skel'); sk.setAttribute('aria-busy', 'true'); sk.append(xBtn(), el('i'), el('i'), el('i')); bg.replaceChildren(sk);
     try {
       const m = await fetchChannels();
       if (!bg.classList.contains('open')) return;
       if (!m.website_chat_enabled && !m.whatsapp_chat_enabled) return;
-      if (m.website_chat_enabled && !m.whatsapp_chat_enabled) openChat();
+      if (m.website_chat_enabled && !(m.whatsapp_chat_enabled && waUrl(m))) openChat();
       else if (!m.website_chat_enabled && m.whatsapp_chat_enabled && waUrl(m)) {
         close(); window.location.assign(waUrl(m));
       } else openChooser(m);
@@ -245,7 +240,7 @@
     const top = el('div', 'gfc-top');
     const back = el('button', 'gfc-x', '\u2039'); back.type = 'button'; back.setAttribute('aria-label', 'Back to choices'); back.title = 'Back to choices';
     back.onclick = () => open();
-    back.hidden = !(channels?.website_chat_enabled && channels?.whatsapp_chat_enabled);
+    back.hidden = !(channels?.website_chat_enabled && channels?.whatsapp_chat_enabled && waUrl(channels));
     const av = el('span', 'gfc-av', 'G'); av.setAttribute('aria-hidden', 'true');
     const who = el('div', 'gfc-who'); const wb = el('b', null, 'GrinFud'); wb.id = 'gfcChatTitle';
     whoSub = el('small', null, aiAvailable ? 'AI ordering assistant' : 'Ordering assistant');
