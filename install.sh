@@ -25,7 +25,7 @@ sudo bash install.sh --email you@example.com [--server-ip PUBLIC_IPV4]
   --pg-port 5432         Existing local PostgreSQL cluster port
   --check               Read-only OS/PostgreSQL/Nginx/DNS diagnostics
 
-Targets Ubuntu 22.04/24.04, grinfud.tushop.live, database/role grinfud.
+Targets Ubuntu 20.04/22.04/24.04, grinfud.tushop.live, database/role grinfud.
 PostgreSQL is NEVER installed, replaced, dropped or reset.
 Existing databases must be owned by grinfud and allow local peer authentication.
 Existing unrelated Nginx sites and credentials are never overwritten.
@@ -47,7 +47,13 @@ die() { echo "ERROR: $*" >&2; return 1; }
 [[ "$PGPORT" =~ ^[0-9]+$ ]] && ((PGPORT > 0 && PGPORT < 65536)) || die 'Invalid PostgreSQL port.'
 [[ $EUID == 0 ]] || die 'Run with sudo.'
 . /etc/os-release
-[[ "$ID" == ubuntu && "$VERSION_ID" =~ ^(22.04|24.04)$ ]] || die 'Supported systems: Ubuntu 22.04 and 24.04.'
+case "$ID:$VERSION_ID" in
+  ubuntu:20.04|ubuntu:22.04|ubuntu:24.04) ;;
+  *) die 'Supported systems: Ubuntu 20.04, 22.04 and 24.04.' ;;
+esac
+if [[ "$VERSION_ID" == 20.04 ]]; then
+  echo 'WARNING: Ubuntu 20.04 is past standard security maintenance. Use Ubuntu Pro/ESM or plan an OS upgrade. This installer will not upgrade your OS or PostgreSQL.' >&2
+fi
 command -v systemctl >/dev/null || die 'A systemd-based server is required.'
 for tool in psql pg_dump pg_isready; do
   command -v "$tool" >/dev/null || die "PostgreSQL tool $tool is missing. Nothing will install PostgreSQL; ask your database administrator."

@@ -1,8 +1,13 @@
 # GrinFud on Ubuntu
 
 This bundle contains the current application and `install.sh`. It targets
-**Ubuntu 22.04 or 24.04**, `grinfud.tushop.live`, and the local PostgreSQL
+**Ubuntu 20.04, 22.04 or 24.04**, `grinfud.tushop.live`, and the local PostgreSQL
 database **grinfud**. Run it on your VPS, not inside Replit.
+
+Ubuntu 20.04 is past standard security maintenance. Keep security updates active
+through Ubuntu Pro/ESM or plan an upgrade to a newer LTS. The installer does not
+upgrade the OS or PostgreSQL. It uses the same private Node 22 runtime and
+systemd/Nginx configuration on all three versions.
 
 ## Before running
 
