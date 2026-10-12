@@ -97,6 +97,7 @@ CREATE TABLE IF NOT EXISTS wa_link (id INTEGER PRIMARY KEY CHECK (id = 1), mode 
   phone_number_id TEXT, display_phone TEXT, webhook_secret TEXT, request_id TEXT, request_status TEXT, request_error TEXT, updated_at TIMESTAMPTZ);
 `;
 const DEFAULT_SETTINGS = {
+  ai_provider: 'gemini',
   business_name: 'GrinFud',
   tagline: 'Farm fresh to your doorstep',
   currency: 'KSh',
@@ -114,6 +115,7 @@ const DEFAULT_SETTINGS = {
 };
 let SETTINGS = {}, ITEMS = [], WA = {};
 const getSettings = () => ({ ...SETTINGS });
+require('./ai').setProvider(() => getSettings().ai_provider || 'gemini');
 const loadSettings = async () => { SETTINGS = Object.fromEntries((await db.q('SELECT key, value FROM settings')).map(r => [r.key, r.value])); };
 const loadItems = async () => { ITEMS = await db.q('SELECT * FROM items ORDER BY category, sort, id'); };
 
@@ -581,12 +583,12 @@ const SETTING_KEYS = Object.keys(DEFAULT_SETTINGS);
 const credentials = require('./credentials');
 app.get('/api/admin/provider-keys', requireAdmin, (req, res) => {
   res.set('Cache-Control', 'no-store');
-  res.json({ gemini: credentials.status('gemini'), leadsintel: credentials.status('leadsintel'), sunpay: credentials.status('sunpay'), demo: DEMO });
+  res.json({ ai_provider: getSettings().ai_provider || 'gemini', openai: credentials.status('openai'), gemini: credentials.status('gemini'), leadsintel: credentials.status('leadsintel'), sunpay: credentials.status('sunpay'), demo: DEMO });
 });
 app.put('/api/admin/provider-keys/:provider', requireAdmin, wrap(async (req, res) => {
   res.set('Cache-Control', 'no-store');
   if (req.get('sec-fetch-site') === 'cross-site' || !req.is('application/json')) return res.status(403).json({ error: 'Use Admin Settings to change keys.' });
-  if (!['gemini', 'leadsintel', 'sunpay'].includes(req.params.provider)) return res.status(400).json({ error: 'Unknown provider.' });
+  if (!['gemini', 'openai', 'leadsintel', 'sunpay'].includes(req.params.provider)) return res.status(400).json({ error: 'Unknown provider.' });
   const body = req.body || {};
   res.json(await credentials.update(req.params.provider, body.key, body.remove === true));
 }));
@@ -600,6 +602,7 @@ app.put('/api/admin/settings', requireAdmin, wrap(async (req, res) => {
   const b = req.body || {}; const changes = [];
   for (const k of SETTING_KEYS) if (k in b) {
     let v = b[k];
+    if (k === 'ai_provider' && !['gemini', 'openai'].includes(v)) throw new Error('Choose Gemini or OpenAI.');
     if (k === 'notify_phone') { // one or more kitchen phones, separated by commas or new lines
       const list = [...new Set(String(v || '').split(/[,\n;]+/).map(x => x.trim()).filter(Boolean).map(normPhone))];
       if (!list.length || list.some(x => !validPhone(x))) throw new Error('Each kitchen phone must be a valid Kenyan number, e.g. 0712 345 678. Use commas for more than one.');

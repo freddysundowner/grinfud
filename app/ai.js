@@ -3,7 +3,9 @@ const MODEL = 'gemini-3.1-flash-lite';
 const buckets = new Map();
 let active = 0;
 const credentials = require('./credentials');
-const available = () => credentials.status('gemini').configured;
+let providerChoice = () => 'gemini';
+function setProvider(getter) { providerChoice = getter; }
+const available = () => credentials.status(providerChoice()).configured;
 function limit(identity) {
   const now = Date.now(), b = buckets.get(identity) || { minute: now, daily: now, count: 0, total: 0 };
   if (now - b.minute >= 60000) { b.minute = now; b.count = 0; }
@@ -19,6 +21,9 @@ async function generate({ system, parts, schema, identity = 'anonymous', timeout
   if (active >= 3) throw Object.assign(new Error('The assistant is busy. Please try again shortly.'), { status: 429 });
   active++;
   try {
+    if (providerChoice() === 'openai') return await require('./ai-openai').generate({
+      key: credentials.get('openai'), system, parts, schema, timeout, maxTokens
+    });
     for (let attempt = 0; attempt < 1; attempt++) {
       let r;
       try {
@@ -113,4 +118,4 @@ async function transcribe(buffer, identity) {
   if (result.text.length > 1000) throw new Error('That voice note is too long. Please send a shorter message.');
   return result.text.trim();
 }
-module.exports = { MODEL, available, interpret, transcribe, validateWav };
+module.exports = { MODEL, available, interpret, transcribe, validateWav, setProvider };

@@ -11,12 +11,35 @@ window.mountProviderKeys = async function (host) {
   catch (e) { host.querySelector('p').textContent = e.message; return; }
   if (!host.isConnected) return;
   host.innerHTML = '<h3>API keys</h3><p class="muted">Keys stay on the server. Leave a field blank to keep its current key.</p>';
+  const selection = document.createElement('form');
+  selection.innerHTML = `<label class="f" for="ai-provider">Chat AI provider</label>
+    <select class="t" id="ai-provider"><option value="gemini">Google Gemini — Flash-Lite</option><option value="openai">OpenAI — GPT-5 nano</option></select>
+    <p class="muted">Both support text replies and website voice notes. Gemini free-tier access depends on your Google account and quota. OpenAI API usage is paid; voice notes use GPT-4o mini transcribe. No automatic paid fallback.</p>
+    <button class="btn btn-p" type="submit">Save AI provider</button>
+    <p role="status" data-result></p>`;
+  selection.querySelector('select').value = state.ai_provider || 'gemini';
+  selection.onsubmit = async e => {
+    e.preventDefault();
+    const button = selection.querySelector('button'), message = selection.querySelector('[data-result]');
+    button.disabled = true;
+    try {
+      const provider = selection.querySelector('select').value;
+      const response = await fetch('/api/admin/settings', { method: 'PUT', credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ai_provider: provider }) });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Could not save AI provider.');
+      state.ai_provider = data.ai_provider;
+      message.textContent = 'Provider saved. Make sure its API key is saved below.';
+    } catch (error) { message.textContent = error.message; }
+    finally { button.disabled = false; }
+  };
+  host.append(selection);
   if (state.demo) {
     const note = document.createElement('p'); note.className = 'muted';
-    note.textContent = 'Demo mode: Gemini calls Google directly. Your saved LeadsIntel key will be used when demo mode is turned off; WhatsApp currently uses the simulator.';
+    note.textContent = 'Demo mode: AI calls the selected provider directly. Your saved LeadsIntel key will be used when demo mode is turned off; WhatsApp currently uses the simulator.';
     host.append(note);
   }
-  for (const [provider, name] of [['gemini', 'Google Gemini'], ['leadsintel', 'LeadsIntel'], ['sunpay', 'SunPay']].filter(([p]) => state[p])) {
+  for (const [provider, name] of [['gemini', 'Google Gemini'], ['openai', 'OpenAI'], ['leadsintel', 'LeadsIntel'], ['sunpay', 'SunPay']].filter(([p]) => state[p])) {
     const form = document.createElement('form'); form.style.marginTop = '18px';
     form.innerHTML = `<label class="f" for="key-${provider}">${name} API key</label>
       <p class="muted" data-status style="margin:4px 0 8px"></p>
@@ -55,7 +78,7 @@ window.mountProviderKeys = async function (host) {
     }
     form.onsubmit = e => { e.preventDefault(); save(false); };
     remove.onclick = () => {
-      if (window.confirm(`Remove the ${name} key? This disables ${provider === 'gemini' ? 'AI understanding and voice transcription' : provider === 'sunpay' ? 'M-Pesa payments for customers (the pay button is hidden; past receipts stay visible)' : 'WhatsApp API operations'} until a new key is saved.`)) save(true);
+      if (window.confirm(`Remove the ${name} key? This disables ${['gemini', 'openai'].includes(provider) ? 'AI understanding and voice transcription when this provider is selected' : provider === 'sunpay' ? 'M-Pesa payments for customers (the pay button is hidden; past receipts stay visible)' : 'WhatsApp API operations'} until a new key is saved.`)) save(true);
     };
   }
 };

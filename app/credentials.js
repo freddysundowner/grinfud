@@ -1,6 +1,6 @@
 // Admin-managed credentials: encrypted at rest, write-only over the API.
 const crypto = require('crypto');
-const names = { gemini: 'GEMINI_API_KEY', leadsintel: 'LEADSINTEL_PLATFORM_KEY', sunpay: 'SUNPAY_API_KEY' };
+const names = { gemini: 'GEMINI_API_KEY', openai: 'OPENAI_API_KEY', leadsintel: 'LEADSINTEL_PLATFORM_KEY', sunpay: 'SUNPAY_API_KEY' };
 let database, saved = new Map();
 function encryptionKey() {
   if (!process.env.SESSION_SECRET) throw new Error('A persistent SESSION_SECRET is required before saving API keys.');
