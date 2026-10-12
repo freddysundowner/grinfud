@@ -136,9 +136,9 @@ if [[ ! -f "$ENV_FILE" ]]; then
     [[ "$(sql -d "$DB" -Atqc "SELECT count(*) FROM provider_credentials WHERE encrypted_value<>''")" == 0 ]] ||
       die "Existing encrypted provider keys require the original SESSION_SECRET. Securely restore $ENV_FILE before continuing."
   fi
-  read -rsp 'New admin password (at least 16 characters, not shown): ' ADMIN </dev/tty; echo
+  read -rsp 'New admin password (at least 6 characters, not shown): ' ADMIN </dev/tty; echo
   read -rsp 'Confirm admin password: ' CONFIRM </dev/tty; echo
-  [[ "$ADMIN" == "$CONFIRM" && ${#ADMIN} -ge 16 ]] || die 'Passwords must match and contain at least 16 characters.'
+  [[ "$ADMIN" == "$CONFIRM" && ${#ADMIN} -ge 6 ]] || die 'Passwords must match and contain at least 6 characters.'
   # Restrict only characters that cannot be represented safely in EnvironmentFile.
   [[ "$ADMIN" != *$'\n'* && "$ADMIN" != *'"'* && "$ADMIN" != *'\'* ]] || die 'Password must not contain newlines, double quotes or backslashes.'
   SECRET="$(openssl rand -hex 48)"

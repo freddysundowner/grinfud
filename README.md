@@ -55,7 +55,9 @@ report that dnsutils is missing. The real installation installs DNS tools.
 You can omit `--server-ip` to detect IPv4 through ipify.
 Use `--pg-port 5433` if your intended PostgreSQL cluster uses another port.
 
-The first installation prompts privately in your terminal for an admin password.
+The first installation prompts privately in your terminal for an admin password
+of at least 6 characters, entered twice to confirm. Use a unique password;
+longer passwords are strongly recommended for this public admin dashboard.
 It creates a persistent session/encryption secret and saves both in
 `/etc/grinfud/grinfud.env`, readable only by root. Reruns preserve that file.
 Do not send these values in chat or include them in Git.
